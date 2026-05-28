@@ -2,6 +2,8 @@
 
 Choose the template matching the `problem_type` track in `references/schema.yaml`.
 
+Language rule: English headings, labels, YAML keys, and schema enum placeholders may stay in English. Replace explanatory placeholder body text with the user's conversation language. Keep identifiers, paths, Unity API names, commands, class/interface names, package names, file names, YAML enum values, tags, and quoted source text unchanged.
+
 ---
 
 ## Bug/Failure Track Template

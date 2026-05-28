@@ -22,7 +22,7 @@ Assume the implementer is a skilled developer, but does not know this Unity proj
 
 Human-readable explanatory prose, requirement descriptions, task detail paragraphs, review notes, questions, and handoff text in generated `docs/` artifacts MUST use the user's conversation language unless the user explicitly asks for another language.
 
-Template labels and structural labels may stay in English. Labels such as `Goal`, `Architecture`, `Verification`, `Task`, `Step`, `Expected`, `Recommendations`, and `Issues Found` are allowed. The content after those labels must be in the user's language.
+Template labels, structural labels, and Markdown headings may stay in English. Labels such as `Goal`, `Architecture`, `Verification`, `Task`, `Step`, `Expected`, `Recommendations`, and `Issues Found` are allowed. The content after those labels must be in the user's language.
 
 If the user writes in Korean, write the plan's explanations, task details, assumptions, verification rationale, reviewer notes, and handoff prose in natural Korean.
 

@@ -65,7 +65,13 @@ Create or update a learning when the work reveals reusable knowledge about:
 
 ## Language Policy
 
-Write docs, questions, reports, and final handoffs in the user's conversation language. Keep identifiers, paths, Unity API names, commands, class/interface names, package names, file names, YAML frontmatter enum values, and quoted source text unchanged.
+Write docs, questions, reports, and final handoffs in the user's conversation language.
+
+English structural labels, Markdown headings, YAML keys, and template labels may stay in English. The explanatory body text under those labels must use the user's conversation language.
+
+Keep identifiers, paths, Unity API names, commands, class/interface names, package names, file names, YAML frontmatter enum values, tags, and quoted source text unchanged.
+
+If the user writes in Korean, write the `docs/solutions/` problem, symptoms, failed attempts, solution, rationale, evidence, prevention, reports, and handoff prose in natural Korean while preserving technical strings exactly.
 
 ## Support Files
 

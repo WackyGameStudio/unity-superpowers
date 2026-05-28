@@ -2,7 +2,7 @@
 
 Use this template when dispatching a spec document reviewer subagent.
 
-**Purpose:** Verify the spec is complete, consistent, and ready for implementation planning.
+**Purpose:** Verify the spec is complete, consistent, uses the expected prose language, and is ready for implementation planning.
 
 **Dispatch after:** Spec document is written to docs/superpowers/specs/
 
@@ -13,6 +13,7 @@ Task tool (general-purpose):
     You are a spec document reviewer. Verify this spec is complete and ready for planning.
 
     **Spec to review:** [SPEC_FILE_PATH]
+    **User conversation language:** [LANGUAGE]
 
     ## What to Check
 
@@ -21,15 +22,23 @@ Task tool (general-purpose):
     | Completeness | TODOs, placeholders, "TBD", incomplete sections |
     | Consistency | Internal contradictions, conflicting requirements |
     | Clarity | Requirements ambiguous enough to cause someone to build the wrong thing |
-    | Scope | Focused enough for a single plan — not covering multiple independent subsystems |
+    | Scope | Focused enough for a single plan, not covering multiple independent subsystems |
     | YAGNI | Unrequested features, over-engineering |
+    | Language | Explanatory body text uses the user's conversation language |
+
+    ## Language Rule
+
+    English template labels such as "Goal", "Scope", "Architecture", "Verification",
+    "Issues Found", and "Recommendations" are allowed. Prose after those labels must
+    use the user's conversation language. Preserve exact identifiers, paths, API names,
+    commands, package names, URLs, code blocks, and quoted source text.
 
     ## Calibration
 
     **Only flag issues that would cause real problems during implementation planning.**
-    A missing section, a contradiction, or a requirement so ambiguous it could be
-    interpreted two different ways — those are issues. Minor wording improvements,
-    stylistic preferences, and "sections less detailed than others" are not.
+    A missing section, a contradiction, a body-language mismatch, or a requirement so
+    ambiguous it could be interpreted two different ways are issues. Minor wording
+    improvements, stylistic preferences, and "sections less detailed than others" are not.
 
     Approve unless there are serious gaps that would lead to a flawed plan.
 

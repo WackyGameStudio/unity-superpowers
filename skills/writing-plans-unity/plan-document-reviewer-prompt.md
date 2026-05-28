@@ -36,11 +36,12 @@ Task tool (general-purpose):
     contradictory steps, placeholder content, tasks so vague they can't be acted on,
     or body prose written in the wrong language.
 
-    English template labels such as "Goal", "Task", "Step", "Expected",
-    "Issues Found", and "Recommendations" are allowed. They are not language
-    issues by themselves. The prose after those labels should use the user's
-    conversation language unless it is an exact technical identifier, command,
-    code symbol, file path, API name, package name, URL, or quoted source text.
+    English template labels and Markdown headings such as "Goal", "Task",
+    "Step", "Expected", "Issues Found", and "Recommendations" are allowed.
+    They are not language issues by themselves. The prose after those labels
+    should use the user's conversation language unless it is an exact technical
+    identifier, command, code symbol, file path, API name, package name, URL,
+    or quoted source text.
 
     ## Output Format
 

@@ -58,4 +58,6 @@ Report exactly what was verified:
 
 Use the user's conversation language for prose, questions, specs, plans, reviews, `docs/solutions/` entries, and final handoffs.
 
+English structural labels, Markdown headings, YAML keys, and template labels may stay in English. Body prose under those labels must use the user's conversation language.
+
 Keep identifiers, paths, command names, Unity API names, package names, frontmatter values, tags, and quoted source text unchanged.
