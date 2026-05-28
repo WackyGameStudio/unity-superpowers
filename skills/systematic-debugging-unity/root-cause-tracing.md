@@ -2,130 +2,147 @@
 
 ## Overview
 
-Bugs often manifest deep in the call stack (git init in wrong directory, file created in wrong location, database opened with wrong path). Your instinct is to fix where the error appears, but that's treating a symptom.
+Bugs often appear deep in Unity runtime code: a `NullReferenceException` in a controller, a prefab with missing serialized references, an asset generated in the wrong project, or MCPForUnity operating against a stale Editor instance. Fixing where the error appears treats the symptom.
 
-**Core principle:** Trace backward through the call chain until you find the original trigger, then fix at the source.
+**Core principle:** Trace backward through the scene, prefab, asset, call chain, and tool target until you find the original trigger, then fix at the source.
 
 ## When to Use
 
 ```dot
 digraph when_to_use {
-    "Bug appears deep in stack?" [shape=diamond];
+    "Bug appears deep in Unity flow?" [shape=diamond];
     "Can trace backwards?" [shape=diamond];
-    "Fix at symptom point" [shape=box];
+    "Fix symptom with guard only" [shape=box];
     "Trace to original trigger" [shape=box];
-    "BETTER: Also add defense-in-depth" [shape=box];
+    "Also add defense-in-depth" [shape=box];
 
-    "Bug appears deep in stack?" -> "Can trace backwards?" [label="yes"];
+    "Bug appears deep in Unity flow?" -> "Can trace backwards?" [label="yes"];
     "Can trace backwards?" -> "Trace to original trigger" [label="yes"];
-    "Can trace backwards?" -> "Fix at symptom point" [label="no - dead end"];
-    "Trace to original trigger" -> "BETTER: Also add defense-in-depth";
+    "Can trace backwards?" -> "Fix symptom with guard only" [label="no - evidence dead end"];
+    "Trace to original trigger" -> "Also add defense-in-depth";
 }
 ```
 
 **Use when:**
-- Error happens deep in execution (not at entry point)
-- Stack trace shows long call chain
-- Unclear where invalid data originated
-- Need to find which test/code triggers the problem
+- Error happens deep in a MonoBehaviour, system, animation, prefab, or tool operation
+- Stack trace shows a long call chain
+- A serialized reference, generated asset, or MCP target is wrong
+- Need to find which Unity test or scene setup creates unwanted state
 
 ## The Tracing Process
 
 ### 1. Observe the Symptom
-```
-Error: git init failed in ~/project/packages/core
+
+```text
+NullReferenceException: PlayerAttackController.PerformAttack()
+weaponConfig is null
 ```
 
 ### 2. Find Immediate Cause
+
 **What code directly causes this?**
-```typescript
-await execFileAsync('git', ['init'], { cwd: projectDir });
+
+```csharp
+damageCalculator.Calculate(weaponConfig.BaseDamage, target.Armor);
 ```
 
 ### 3. Ask: What Called This?
-```typescript
-WorktreeManager.createSessionWorktree(projectDir, sessionId)
-  → called by Session.initializeWorkspace()
-  → called by Session.create()
-  → called by test at Project.create()
+
+```text
+PlayerAttackController.PerformAttack()
+<- PlayerInputRouter.FirePressed()
+<- PlayerRuntimeInstaller wires input to controller
+<- Scene uses Player_Combat.prefab
 ```
 
 ### 4. Keep Tracing Up
+
 **What value was passed?**
-- `projectDir = ''` (empty string!)
-- Empty string as `cwd` resolves to `process.cwd()`
-- That's the source code directory!
+- `weaponConfig = null`
+- `Player_Combat.prefab` has an empty serialized `weaponConfig` field
+- Base `Player.prefab` has the correct reference
+- Variant override removed the reference
 
 ### 5. Find Original Trigger
-**Where did empty string come from?**
-```typescript
-const context = setupCoreTest(); // Returns { tempDir: '' }
-Project.create('name', context.tempDir); // Accessed before beforeEach!
+
+**Where did the bad state originate?**
+
+```text
+Recent refactor moved weapon data from PlayerStats to WeaponConfig.
+Base prefab was updated.
+Combat prefab variant was not inspected after the serialized field move.
 ```
 
-## Adding Stack Traces
+## Adding Unity Evidence
 
-When you can't trace manually, add instrumentation:
+When manual tracing stalls, add temporary instrumentation near the failing operation:
 
-```typescript
-// Before the problematic operation
-async function gitInit(directory: string) {
-  const stack = new Error().stack;
-  console.error('DEBUG git init:', {
-    directory,
-    cwd: process.cwd(),
-    nodeEnv: process.env.NODE_ENV,
-    stack,
-  });
+```csharp
+private void PerformAttack()
+{
+#if UNITY_EDITOR
+    var prefabLinked = UnityEditor.PrefabUtility.IsPartOfPrefabInstance(gameObject);
+#else
+    var prefabLinked = false;
+#endif
 
-  await execFileAsync('git', ['init'], { cwd: directory });
+    Debug.LogError(
+        $"DEBUG attack source={name} scene={gameObject.scene.path} " +
+        $"prefabLinked={prefabLinked} " +
+        $"weaponConfig={(weaponConfig == null ? "null" : weaponConfig.name)}",
+        this);
+
+    damageCalculator.Calculate(weaponConfig.BaseDamage, target.Armor);
 }
 ```
 
-**Critical:** Use `console.error()` in tests (not logger - may not show)
+For runtime-only code, use `Debug.LogError(..., this)` so the console links back to the object.
 
-**Run and capture:**
-```bash
-npm test 2>&1 | grep 'DEBUG git init'
-```
-
-**Analyze stack traces:**
-- Look for test file names
-- Find the line number triggering the call
-- Identify the pattern (same test? same parameter?)
-
-## Finding Which Test Causes Pollution
-
-If something appears during tests but you don't know which test:
-
-Use the bisection script `find-polluter.sh` in this directory:
+Run targeted tests:
 
 ```bash
-./find-polluter.sh '.git' 'src/**/*.test.ts'
+Unity.exe -batchmode -projectPath . -runTests -testPlatform PlayMode -testFilter PlayerAttackTests -testResults TestResults.xml -quit
 ```
 
-Runs tests one-by-one, stops at first polluter. See script for usage.
+If using MCPForUnity, verify the tool target before trusting tool output:
 
-## Real Example: Empty projectDir
+```text
+MCP target identity
+Application.dataPath
+active scene path
+selected prefab or asset path
+```
 
-**Symptom:** `.git` created in `packages/core/` (source code)
+## Finding Which Unity Test Causes Pollution
+
+If an asset, scene object, or generated file appears during tests but you do not know which test created it:
+
+```bash
+./find-polluter.sh 'Assets/Generated/Debug.asset' test-names.txt "$UNITY_EDITOR" . EditMode
+```
+
+`test-names.txt` should contain one fully-qualified Unity test name per line.
+
+## Real Example: Missing Prefab Variant Reference
+
+**Symptom:** attack works in one scene but fails in PlayMode tests.
 
 **Trace chain:**
-1. `git init` runs in `process.cwd()` ← empty cwd parameter
-2. WorktreeManager called with empty projectDir
-3. Session.create() passed empty string
-4. Test accessed `context.tempDir` before beforeEach
-5. setupCoreTest() returns `{ tempDir: '' }` initially
+1. `PerformAttack()` dereferences `weaponConfig`
+2. `PlayerAttackController` on runtime object has null field
+3. Runtime object came from `Player_Combat.prefab`
+4. `Player_Combat.prefab` is a variant of `Player.prefab`
+5. Variant override preserved an empty field after a serialized field migration
 
-**Root cause:** Top-level variable initialization accessing empty value
+**Root cause:** prefab variant not re-wired after data moved into `WeaponConfig`.
 
-**Fix:** Made tempDir a getter that throws if accessed before beforeEach
+**Fix:** repair the variant reference and add an EditMode prefab validation test.
 
-**Also added defense-in-depth:**
-- Layer 1: Project.create() validates directory
-- Layer 2: WorkspaceManager validates not empty
-- Layer 3: NODE_ENV guard refuses git init outside tmpdir
-- Layer 4: Stack trace logging before git init
+**Also add defense-in-depth:**
+- Layer 1: `OnValidate` warns when required config is missing
+- Layer 2: prefab validation test scans shipped player prefabs
+- Layer 3: PlayMode smoke test attacks once in the representative combat scene
+- Layer 4: MCP/editor verification records active scene and prefab path before completion
 
 ## Key Principle
 
@@ -133,37 +150,22 @@ Runs tests one-by-one, stops at first polluter. See script for usage.
 digraph principle {
     "Found immediate cause" [shape=ellipse];
     "Can trace one level up?" [shape=diamond];
-    "Trace backwards" [shape=box];
-    "Is this the source?" [shape=diamond];
+    "Trace Unity source backwards" [shape=box];
+    "Is this the original trigger?" [shape=diamond];
     "Fix at source" [shape=box];
-    "Add validation at each layer" [shape=box];
-    "Bug impossible" [shape=doublecircle];
-    "NEVER fix just the symptom" [shape=octagon, style=filled, fillcolor=red, fontcolor=white];
+    "Add validation at each Unity layer" [shape=box];
+    "Bug unlikely to recur" [shape=doublecircle];
+    "STOP: Do not fix only the symptom" [shape=octagon, style=filled, fillcolor=red, fontcolor=white];
 
     "Found immediate cause" -> "Can trace one level up?";
-    "Can trace one level up?" -> "Trace backwards" [label="yes"];
-    "Can trace one level up?" -> "NEVER fix just the symptom" [label="no"];
-    "Trace backwards" -> "Is this the source?";
-    "Is this the source?" -> "Trace backwards" [label="no - keeps going"];
-    "Is this the source?" -> "Fix at source" [label="yes"];
-    "Fix at source" -> "Add validation at each layer";
-    "Add validation at each layer" -> "Bug impossible";
+    "Can trace one level up?" -> "Trace Unity source backwards" [label="yes"];
+    "Can trace one level up?" -> "STOP: Do not fix only the symptom" [label="no"];
+    "Trace Unity source backwards" -> "Is this the original trigger?";
+    "Is this the original trigger?" -> "Trace Unity source backwards" [label="no - keep going"];
+    "Is this the original trigger?" -> "Fix at source" [label="yes"];
+    "Fix at source" -> "Add validation at each Unity layer";
+    "Add validation at each Unity layer" -> "Bug unlikely to recur";
 }
 ```
 
-**NEVER fix just where the error appears.** Trace back to find the original trigger.
-
-## Stack Trace Tips
-
-**In tests:** Use `console.error()` not logger - logger may be suppressed
-**Before operation:** Log before the dangerous operation, not after it fails
-**Include context:** Directory, cwd, environment variables, timestamps
-**Capture stack:** `new Error().stack` shows complete call chain
-
-## Real-World Impact
-
-From debugging session (2025-10-03):
-- Found root cause through 5-level trace
-- Fixed at source (getter validation)
-- Added 4 layers of defense
-- 1847 tests passed, zero pollution
+**Do not fix only where the error appears.** Trace back to the scene, prefab, asset, serialized data, command, or MCP target that introduced it.

@@ -9,13 +9,18 @@ Use the skills in this order for non-trivial Unity work:
 1. `unity-init` when project setup, Git state, MCPForUnity, or Editor verification is missing or uncertain
 2. `brainstorming-unity` before gameplay features, tools, packages, scenes, prefabs, or behavior changes
 3. `writing-plans-unity` after a design is approved and before implementation
-4. `subagent-driven-development-unity` or `executing-plans-unity` to execute a plan
-5. `test-driven-development-unity` for feature and bugfix implementation
-6. `systematic-debugging-unity` for failures, regressions, console errors, broken scene behavior, or package issues
-7. `requesting-code-review-unity` and `receiving-code-review-unity` for review loops
-8. `verification-before-completion-unity` before any completion claim
-9. `compound-unity` after a reusable Unity workaround or lesson is verified
-10. `finishing-a-development-branch-unity` when implementation is complete and verified
+4. `using-git-worktrees-unity` before executing implementation plans, unless the user explicitly approves working in place
+5. `subagent-driven-development-unity` or `executing-plans-unity` to execute a plan
+6. `test-driven-development-unity` for feature and bugfix implementation
+7. `systematic-debugging-unity` for failures, regressions, console errors, broken scene behavior, or package issues
+8. `requesting-code-review-unity` and `receiving-code-review-unity` for review loops
+9. `verification-before-completion-unity` before any completion claim
+10. `compound-unity` after a reusable Unity workaround or lesson is verified
+11. `finishing-a-development-branch-unity` when implementation is complete and verified
+
+After `brainstorming-unity` writes a spec, explicitly ask whether to proceed to `writing-plans-unity`.
+
+After `writing-plans-unity` writes a plan, explicitly ask whether to use `using-git-worktrees-unity` and then execute with `subagent-driven-development-unity` or `executing-plans-unity`.
 
 ## MCPForUnity
 

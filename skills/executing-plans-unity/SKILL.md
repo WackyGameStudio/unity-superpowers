@@ -13,6 +13,7 @@ Load plan, review critically, execute all tasks, report when complete.
 
 Before executing a Unity plan, confirm:
 
+- `using-git-worktrees-unity` has already set up or verified an isolated workspace, or the user explicitly approved working in place
 - current folder is the intended Unity project or package source
 - MCPForUnity target is correct when Editor operations are required
 - scene/prefab/asset integration tasks are not mixed with unrelated code tasks
@@ -20,15 +21,16 @@ Before executing a Unity plan, confirm:
 
 **Announce at start:** "I'm using the executing-plans-unity skill to implement this plan."
 
-**Note:** Tell your human partner that Superpowers works much better with access to subagents. The quality of its work will be significantly higher if run on a platform with subagent support (such as Claude Code or Codex). If subagents are available, use subagent-driven-development-unity instead of this skill.
+**Note:** If subagents are available, prefer `subagent-driven-development-unity`. If the user still chooses inline execution, continue here after the worktree gate.
 
 ## The Process
 
 ### Step 1: Load and Review Plan
-1. Read plan file
-2. Review critically - identify any questions or concerns about the plan
-3. If concerns: Raise them with your human partner before starting
-4. If no concerns: Create TodoWrite and proceed
+1. Confirm `using-git-worktrees-unity` was used or the user approved working in place.
+2. Read plan file.
+3. Review critically - identify any questions or concerns about the plan.
+4. If concerns: Raise them with your human partner before starting.
+5. If no concerns: Create TodoWrite and proceed.
 
 ### Step 2: Execute Tasks
 

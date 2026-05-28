@@ -176,9 +176,9 @@ Fix any issues inline. No need to re-review; just fix and move on.
 **User Review Gate:**
 After the spec review loop passes, ask the user to review the written spec before proceeding:
 
-> "Spec written and committed to `<path>`. Please review it and let me know if you want to make any changes before we start writing out the implementation plan."
+> "Spec written and committed to `<path>`. Please review it. If there are no changes, should I create the implementation plan with writing-plans-unity?"
 
-The quote above is a structure example. In actual handoff text, use the user's conversation language while keeping the path unchanged.
+The quote above is a structure example. In actual handoff text, use the user's conversation language while keeping the path unchanged. The handoff MUST explicitly ask whether to proceed to `writing-plans-unity`.
 
 Wait for the user's response. If they request changes, make them and re-run the spec review loop. Only proceed once the user approves.
 

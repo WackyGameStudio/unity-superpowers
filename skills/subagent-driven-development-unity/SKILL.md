@@ -7,7 +7,7 @@ description: Use when executing implementation plans with independent tasks in t
 
 Execute plan by dispatching fresh subagent per task, with two-stage review after each: spec compliance review first, then code quality review.
 
-**Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
+**Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history; you construct exactly what they need. This also preserves your own context for coordination work.
 
 **Core principle:** Fresh subagent per task + two-stage review (spec then quality) = high quality, fast iteration
 
@@ -27,7 +27,9 @@ Do not let two subagents edit the same `.unity`, `.prefab`, `.asset`, `.meta`, o
 
 When constructing prompts, include any project-local Unity architecture notes, source analysis, implementation plans, or targeted solution findings if present.
 
-**Continuous execution:** Do not pause to check in with your human partner between tasks. Execute all tasks from the plan without stopping. The only reasons to stop are: BLOCKED status you cannot resolve, ambiguity that genuinely prevents progress, or all tasks complete. "Should I continue?" prompts and progress summaries waste their time — they asked you to execute the plan, so execute it.
+Before dispatching the first implementer, confirm `using-git-worktrees-unity` has set up or verified isolation, or the user explicitly approved working in place.
+
+**Continuous execution:** Do not pause to check in with your human partner between tasks. Execute all tasks from the plan without stopping. The only reasons to stop are: BLOCKED status you cannot resolve, ambiguity that genuinely prevents progress, or all tasks complete. "Should I continue?" prompts and progress summaries waste their time; they asked you to execute the plan, so execute it.
 
 ## When to Use
 
@@ -76,11 +78,13 @@ digraph process {
         "Mark task complete in TodoWrite" [shape=box];
     }
 
+    "Confirm worktree isolation or explicit in-place approval" [shape=box];
     "Read plan, extract all tasks with full text, note context, create TodoWrite" [shape=box];
     "More tasks remain?" [shape=diamond];
     "Dispatch final code reviewer subagent for entire implementation" [shape=box];
     "Use finishing-a-development-branch-unity" [shape=box style=filled fillcolor=lightgreen];
 
+    "Confirm worktree isolation or explicit in-place approval" -> "Read plan, extract all tasks with full text, note context, create TodoWrite";
     "Read plan, extract all tasks with full text, note context, create TodoWrite" -> "Dispatch implementer subagent (./implementer-prompt.md)";
     "Dispatch implementer subagent (./implementer-prompt.md)" -> "Implementer subagent asks questions?";
     "Implementer subagent asks questions?" -> "Answer questions, provide context" [label="yes"];
@@ -113,9 +117,9 @@ Use the least powerful model that can handle each role to conserve cost and incr
 **Architecture, design, and review tasks**: use the most capable available model.
 
 **Task complexity signals:**
-- Touches 1-2 files with a complete spec → cheap model
-- Touches multiple files with integration concerns → standard model
-- Requires design judgment or broad codebase understanding → most capable model
+- Touches 1-2 pure C# files with a complete spec - cheap model
+- Touches multiple files or Unity integration surfaces - standard model
+- Requires scene/prefab/package/MCPForUnity judgment, architecture, or broad codebase understanding - most capable model
 
 ## Handling Implementer Status
 
@@ -144,77 +148,63 @@ Implementer subagents report one of four statuses. Handle each appropriately:
 ## Example Workflow
 
 ```
-You: I'm using Subagent-Driven Development to execute this plan.
+You: I'm using Subagent-Driven Development to execute this Unity plan.
 
-[Read plan file once: docs/superpowers/plans/feature-plan.md]
-[Extract all 5 tasks with full text and context]
+[Confirm using-git-worktrees-unity already set up or verified isolation]
+[Read plan file once: docs/superpowers/plans/player-interaction.md]
+[Extract all tasks with full text and Unity surfaces]
 [Create TodoWrite with all tasks]
 
-Task 1: Hook installation script
+Task 1: Interaction range domain logic
 
-[Get Task 1 text and context (already extracted)]
-[Dispatch implementation subagent with full task text + context]
+[Get Task 1 text and context]
+[Dispatch implementer with full task text, allowed files, forbidden Unity surfaces, and expected EditMode evidence]
 
-Implementer: "Before I begin - should the hook be installed at user or system level?"
-
-You: "User level (~/.config/superpowers/hooks/)"
-
-Implementer: "Got it. Implementing now..."
-[Later] Implementer:
-  - Implemented install-hook command
-  - Added tests, 5/5 passing
-  - Self-review: Found I missed --force flag, added it
+Implementer:
+  - Implemented InteractionRange in Assets/Scripts/Interaction/InteractionRange.cs
+  - Added EditMode tests in Assets/Tests/EditMode/Interaction/InteractionRangeTests.cs
+  - run_tests(EditMode): 5/5 passing
+  - Did not edit scenes, prefabs, assets, or .meta files
   - Committed
 
 [Dispatch spec compliance reviewer]
-Spec reviewer: ✅ Spec compliant - all requirements met, nothing extra
+Spec reviewer: Spec compliant - all requirements met, no extra Unity surfaces touched
 
 [Get git SHAs, dispatch code quality reviewer]
-Code reviewer: Strengths: Good test coverage, clean. Issues: None. Approved.
+Code reviewer: Strengths: focused pure C# boundary and real tests. Issues: None. Approved.
 
 [Mark Task 1 complete]
 
-Task 2: Recovery modes
+Task 2: Player prefab wiring
 
-[Get Task 2 text and context (already extracted)]
-[Dispatch implementation subagent with full task text + context]
+[Get Task 2 text and context]
+[Dispatch implementer with prefab path, serialized fields, MCPForUnity target requirement, and prefab smoke expectation]
 
-Implementer: [No questions, proceeds]
 Implementer:
-  - Added verify/repair modes
-  - 8/8 tests passing
-  - Self-review: All good
+  - Added PlayerInteractor component to Assets/Prefabs/Player.prefab
+  - Wired interaction layer mask and InteractionPrompt reference
+  - refresh_unity/read_console: no new relevant errors
+  - Prefab smoke: required serialized references present
   - Committed
 
 [Dispatch spec compliance reviewer]
-Spec reviewer: ❌ Issues:
-  - Missing: Progress reporting (spec says "report every 100 items")
-  - Extra: Added --json flag (not requested)
+Spec reviewer: Issues found:
+  - Missing: plan required scene smoke in Assets/Scenes/Game.unity
 
 [Implementer fixes issues]
-Implementer: Removed --json flag, added progress reporting
+Implementer: Opened scene, verified Player prefab instance references, ran scene smoke
 
 [Spec reviewer reviews again]
-Spec reviewer: ✅ Spec compliant now
+Spec reviewer: Spec compliant now
 
 [Dispatch code quality reviewer]
-Code reviewer: Strengths: Solid. Issues (Important): Magic number (100)
-
-[Implementer fixes]
-Implementer: Extracted PROGRESS_INTERVAL constant
-
-[Code reviewer reviews again]
-Code reviewer: ✅ Approved
+Code reviewer: Strengths: prefab wiring is explicit. Issues: None. Approved.
 
 [Mark Task 2 complete]
 
-...
-
 [After all tasks]
-[Dispatch final code-reviewer]
-Final reviewer: All requirements met, ready to merge
-
-Done!
+[Dispatch final Unity code reviewer]
+Final reviewer: Requirements met, Unity evidence sufficient, ready for finishing-a-development-branch-unity
 ```
 
 ## Advantages
@@ -262,7 +252,7 @@ Done!
 - Accept "close enough" on spec compliance (spec reviewer found issues = not done)
 - Skip review loops (reviewer found issues = implementer fixes = review again)
 - Let implementer self-review replace actual review (both are needed)
-- **Start code quality review before spec compliance is ✅** (wrong order)
+- **Start code quality review before spec compliance is approved** (wrong order)
 - Move to next task while either review has open issues
 
 **If subagent asks questions:**

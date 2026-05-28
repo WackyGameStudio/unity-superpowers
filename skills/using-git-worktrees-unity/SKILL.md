@@ -138,22 +138,23 @@ if [ -f go.mod ]; then go mod download; fi
 
 ## Step 4: Verify Clean Baseline
 
-Run tests to ensure workspace starts clean:
+Run the strongest available baseline evidence before implementation:
 
-```bash
-# Use project-appropriate command
-npm test / cargo test / pytest / go test ./...
+```text
+MCPForUnity target identity -> Application.dataPath -> refresh_unity -> read_console -> EditMode tests -> PlayMode tests where relevant
 ```
 
-**If tests fail:** Report failures, ask whether to proceed or investigate.
+If MCPForUnity is unavailable, run valid project fallback checks and report that Editor/runtime proof is unavailable. Do not claim Unity runtime or Editor verification from file-state checks alone.
 
-**If tests pass:** Report ready.
+**If baseline verification fails:** Report failures, ask whether to proceed, investigate, or fix setup first.
+
+**If baseline verification passes or limitations are explicit:** Report ready.
 
 ### Report
 
 ```
 Worktree ready at <full-path>
-Tests passing (<N> tests, 0 failures)
+Baseline evidence: <target identity | console | tests | limitations>
 Ready to implement <feature-name>
 ```
 

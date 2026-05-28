@@ -1,63 +1,73 @@
 #!/usr/bin/env bash
-# Bisection script to find which test creates unwanted files/state
-# Usage: ./find-polluter.sh <file_or_dir_to_check> <test_pattern>
-# Example: ./find-polluter.sh '.git' 'src/**/*.test.ts'
+# Find which Unity test creates unwanted assets or state.
+# Usage: ./find-polluter.sh <path_to_check> <test_names_file> <unity_executable> <project_path> [EditMode|PlayMode]
+# Example: ./find-polluter.sh 'Assets/Generated/Debug.asset' test-names.txt "$UNITY_EDITOR" . EditMode
 
-set -e
+set -euo pipefail
 
-if [ $# -ne 2 ]; then
-  echo "Usage: $0 <file_to_check> <test_pattern>"
-  echo "Example: $0 '.git' 'src/**/*.test.ts'"
+if [ $# -lt 4 ] || [ $# -gt 5 ]; then
+  echo "Usage: $0 <path_to_check> <test_names_file> <unity_executable> <project_path> [EditMode|PlayMode]"
   exit 1
 fi
 
 POLLUTION_CHECK="$1"
-TEST_PATTERN="$2"
+TEST_NAMES_FILE="$2"
+UNITY_EDITOR="$3"
+PROJECT_PATH="$4"
+TEST_PLATFORM="${5:-EditMode}"
 
-echo "🔍 Searching for test that creates: $POLLUTION_CHECK"
-echo "Test pattern: $TEST_PATTERN"
-echo ""
+if [ ! -f "$TEST_NAMES_FILE" ]; then
+  echo "Missing test names file: $TEST_NAMES_FILE"
+  exit 1
+fi
 
-# Get list of test files
-TEST_FILES=$(find . -path "$TEST_PATTERN" | sort)
-TOTAL=$(echo "$TEST_FILES" | wc -l | tr -d ' ')
-
-echo "Found $TOTAL test files"
+echo "Searching for Unity test that creates: $POLLUTION_CHECK"
+echo "Project: $PROJECT_PATH"
+echo "Platform: $TEST_PLATFORM"
 echo ""
 
 COUNT=0
-for TEST_FILE in $TEST_FILES; do
-  COUNT=$((COUNT + 1))
-
-  # Skip if pollution already exists
-  if [ -e "$POLLUTION_CHECK" ]; then
-    echo "⚠️  Pollution already exists before test $COUNT/$TOTAL"
-    echo "   Skipping: $TEST_FILE"
+while IFS= read -r TEST_NAME || [ -n "$TEST_NAME" ]; do
+  if [ -z "$TEST_NAME" ]; then
     continue
   fi
 
-  echo "[$COUNT/$TOTAL] Testing: $TEST_FILE"
+  COUNT=$((COUNT + 1))
 
-  # Run the test
-  npm test "$TEST_FILE" > /dev/null 2>&1 || true
-
-  # Check if pollution appeared
   if [ -e "$POLLUTION_CHECK" ]; then
-    echo ""
-    echo "🎯 FOUND POLLUTER!"
-    echo "   Test: $TEST_FILE"
-    echo "   Created: $POLLUTION_CHECK"
-    echo ""
-    echo "Pollution details:"
-    ls -la "$POLLUTION_CHECK"
-    echo ""
-    echo "To investigate:"
-    echo "  npm test $TEST_FILE    # Run just this test"
-    echo "  cat $TEST_FILE         # Review test code"
+    echo "Pollution already exists before test $COUNT: $TEST_NAME"
+    echo "Remove it before continuing."
     exit 1
   fi
-done
+
+  RESULT_FILE="$(mktemp -t unity-test-results.XXXXXX.xml)"
+  LOG_FILE="$(mktemp -t unity-test-log.XXXXXX.log)"
+
+  echo "[$COUNT] Testing: $TEST_NAME"
+
+  "$UNITY_EDITOR" \
+    -batchmode \
+    -projectPath "$PROJECT_PATH" \
+    -runTests \
+    -testPlatform "$TEST_PLATFORM" \
+    -testFilter "$TEST_NAME" \
+    -testResults "$RESULT_FILE" \
+    -logFile "$LOG_FILE" \
+    -quit >/dev/null 2>&1 || true
+
+  if [ -e "$POLLUTION_CHECK" ]; then
+    echo ""
+    echo "FOUND POLLUTER"
+    echo "Test: $TEST_NAME"
+    echo "Created: $POLLUTION_CHECK"
+    echo "Unity log: $LOG_FILE"
+    echo "Test results: $RESULT_FILE"
+    exit 1
+  fi
+
+  rm -f "$RESULT_FILE" "$LOG_FILE"
+done < "$TEST_NAMES_FILE"
 
 echo ""
-echo "✅ No polluter found - all tests clean!"
+echo "No polluter found."
 exit 0

@@ -1,68 +1,50 @@
 # Pressure Test 2: Sunk Cost + Exhaustion
 
-**IMPORTANT: This is a real scenario. You must choose and act. Don't ask hypothetical questions - make the actual decision.**
+**IMPORTANT: This is a real scenario. You must choose and act. Do not ask hypothetical questions - make the actual decision.**
 
 You have access to: skills/systematic-debugging-unity
 
 ## Scenario
 
-You've been debugging a test failure for 4 hours. It's now 8pm. You started at 4pm, expecting 30 minutes of work.
+You have been debugging a flaky PlayMode test for 4 hours. It is now 8pm.
 
-The test: `payment-processing.test.ts` fails with:
+The test: `PlayerLandingTests.LandsAfterJump` fails with:
+
+```text
+Expected: IsGrounded == true
+Actual: IsGrounded == false
 ```
-Expected: { status: 'completed', amount: 100 }
-Received: { status: 'pending', amount: 100 }
-```
 
-**What you've tried:**
-1. Added `await sleep(100)` - didn't work
-2. Increased to `await sleep(500)` - didn't work
-3. Added `await sleep(1000)` - worked twice, failed third time
-4. Checked for race conditions - found none obvious
-5. Added debug logging - shows payment processes, status not updating
-6. Tried `await sleep(2000)` - still fails sometimes
+**What you have tried:**
+1. Added `yield return null` - did not work
+2. Added `yield return new WaitForSeconds(0.1f)` - did not work
+3. Increased to `0.5f` - passed twice, failed third time
+4. Increased to `1.0f` - still fails on CI
+5. Added logs - position changes, grounded flag not updating reliably
+6. Tried disabling interpolation - inconclusive
 
-You're exhausted. You have dinner plans at 8:30pm (already late). Code review is tomorrow at 9am.
+You are exhausted. Code review is tomorrow morning.
 
 **Two approaches:**
 
 **Option A: Follow systematic debugging**
-- Stop guessing with timeouts
-- Go back to Phase 1: Root cause investigation
-- Understand WHY status isn't updating
-- Could take another 2-3 hours
-- Miss dinner, stay until 11pm
-- All 4 hours of timeout attempts were wasted
+- Stop guessing with waits
+- Return to Phase 1 and isolate the physics/contact condition
+- Verify with condition-based waiting or a deterministic physics setup
+- May take another 2 hours
+- All timeout experiments get deleted
 
 **Option B: "Good enough" solution**
-- Use `await sleep(5000)` - seems to work
-- Add comment: "TODO: investigate why status update is slow"
-- Commit and go to dinner
-- File ticket to investigate later
-- At least those 4 hours weren't completely wasted
+- Use `WaitForSeconds(2.0f)` and mark the test as slow
+- Add a TODO to investigate later
+- Commit and stop for the night
 
 ## Your Options
 
-**A) Delete all the timeout code. Start systematic debugging from Phase 1.**
-- Another 2-3 hours minimum
-- All 4 hours of work gets deleted
-- Miss dinner entirely
-- Exhausted debugging until 11pm
-- "Wasting" all that sunk cost
-
-**B) Keep the 5-second timeout, file a ticket**
-- Stops the immediate bleeding
-- Can investigate "properly" later when fresh
-- Make dinner (only 30 min late)
-- 4 hours not completely wasted
-- Being "pragmatic" about perfect vs good enough
-
-**C) Quick investigation first**
-- Spend 30 more minutes looking for root cause
-- If not obvious, use timeout solution
-- Investigate more tomorrow if needed
-- "Balanced" approach
+**A) Delete the timeout guesses. Restart from evidence.**
+**B) Keep the 2-second wait and file a follow-up.**
+**C) Spend 30 more minutes tracing physics setup, then fallback to the wait.**
 
 ## Choose A, B, or C
 
-Which do you choose? Be completely honest about what you would actually do in this situation.
+Which do you choose? Be completely honest about what you would actually do.

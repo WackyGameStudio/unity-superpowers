@@ -86,36 +86,37 @@ digraph tdd_cycle {
 Write one minimal test showing what should happen.
 
 <Good>
-```typescript
-test('retries failed operations 3 times', async () => {
-  let attempts = 0;
-  const operation = () => {
-    attempts++;
-    if (attempts < 3) throw new Error('fail');
-    return 'success';
-  };
+```csharp
+using NUnit.Framework;
+using UnityEngine;
 
-  const result = await retryOperation(operation);
+public sealed class MovementMathTests
+{
+    [Test]
+    public void ClampVelocity_LimitsMagnitudeToMaxSpeed()
+    {
+        var velocity = new Vector3(10f, 0f, 0f);
 
-  expect(result).toBe('success');
-  expect(attempts).toBe(3);
-});
+        var result = MovementMath.ClampVelocity(velocity, maxSpeed: 4f);
+
+        Assert.That(result.magnitude, Is.EqualTo(4f).Within(0.001f));
+    }
+}
 ```
 Clear name, tests real behavior, one thing
 </Good>
 
 <Bad>
-```typescript
-test('retry works', async () => {
-  const mock = jest.fn()
-    .mockRejectedValueOnce(new Error())
-    .mockRejectedValueOnce(new Error())
-    .mockResolvedValueOnce('success');
-  await retryOperation(mock);
-  expect(mock).toHaveBeenCalledTimes(3);
-});
+```csharp
+[Test]
+public void Movement_Works()
+{
+    var motor = new MockPlayerMotor();
+    motor.Move(Vector3.right);
+    Assert.That(motor.MoveWasCalled, Is.True);
+}
 ```
-Vague name, tests mock not code
+Vague name, tests mock state instead of behavior
 </Bad>
 
 **Requirements:**
@@ -127,8 +128,8 @@ Vague name, tests mock not code
 
 **MANDATORY. Never skip.**
 
-```bash
-npm test path/to/test.test.ts
+```text
+run_tests(EditMode, test_names: MovementMathTests.ClampVelocity_LimitsMagnitudeToMaxSpeed)
 ```
 
 Confirm:
@@ -145,32 +146,30 @@ Confirm:
 Write simplest code to pass the test.
 
 <Good>
-```typescript
-async function retryOperation<T>(fn: () => Promise<T>): Promise<T> {
-  for (let i = 0; i < 3; i++) {
-    try {
-      return await fn();
-    } catch (e) {
-      if (i === 2) throw e;
+```csharp
+using UnityEngine;
+
+public static class MovementMath
+{
+    public static Vector3 ClampVelocity(Vector3 velocity, float maxSpeed)
+    {
+        return Vector3.ClampMagnitude(velocity, maxSpeed);
     }
-  }
-  throw new Error('unreachable');
 }
 ```
 Just enough to pass
 </Good>
 
 <Bad>
-```typescript
-async function retryOperation<T>(
-  fn: () => Promise<T>,
-  options?: {
-    maxRetries?: number;
-    backoff?: 'linear' | 'exponential';
-    onRetry?: (attempt: number) => void;
-  }
-): Promise<T> {
-  // YAGNI
+```csharp
+public sealed class AdvancedMovementPipeline : MonoBehaviour
+{
+    public AnimationCurve accelerationCurve;
+    public AudioSource footstepSource;
+    public ParticleSystem dust;
+    public UnityEvent onSpeedChanged;
+
+    // YAGNI for a velocity clamp test.
 }
 ```
 Over-engineered
@@ -182,8 +181,8 @@ Don't add features, refactor other code, or "improve" beyond the test.
 
 **MANDATORY.**
 
-```bash
-npm test path/to/test.test.ts
+```text
+run_tests(EditMode, test_names: MovementMathTests.ClampVelocity_LimitsMagnitudeToMaxSpeed)
 ```
 
 Confirm:
@@ -234,7 +233,7 @@ Manual testing is ad-hoc. You think you tested everything but:
 - No record of what you tested
 - Can't re-run when code changes
 - Easy to forget cases under pressure
-- "It worked when I tried it" ≠ comprehensive
+- "It worked when I tried it" is not comprehensive
 
 Automated tests are systematic. They run the same way every time.
 
@@ -264,7 +263,7 @@ Tests-after are biased by your implementation. You test what you built, not what
 
 Tests-first force edge case discovery before implementing. Tests-after verify you remembered everything (you didn't).
 
-30 minutes of tests after ≠ TDD. You get coverage, lose proof tests work.
+30 minutes of tests after is not TDD. You get coverage, lose proof tests work.
 
 ## Common Rationalizations
 
@@ -273,7 +272,7 @@ Tests-first force edge case discovery before implementing. Tests-after verify yo
 | "Too simple to test" | Simple code breaks. Test takes 30 seconds. |
 | "I'll test after" | Tests passing immediately prove nothing. |
 | "Tests after achieve same goals" | Tests-after = "what does this do?" Tests-first = "what should this do?" |
-| "Already manually tested" | Ad-hoc ≠ systematic. No record, can't re-run. |
+| "Already manually tested" | Ad-hoc is not systematic. No record, can't re-run. |
 | "Deleting X hours is wasteful" | Sunk cost fallacy. Keeping unverified code is technical debt. |
 | "Keep as reference, write tests first" | You'll adapt it. That's testing after. Delete means delete. |
 | "Need to explore first" | Fine. Throw away exploration, start with TDD. |
@@ -302,36 +301,52 @@ Tests-first force edge case discovery before implementing. Tests-after verify yo
 
 ## Example: Bug Fix
 
-**Bug:** Empty email accepted
+**Bug:** Jump action fires while the ground check is disabled
 
 **RED**
-```typescript
-test('rejects empty email', async () => {
-  const result = await submitForm({ email: '' });
-  expect(result.error).toBe('Email required');
-});
+```csharp
+using NUnit.Framework;
+
+public sealed class JumpStateTests
+{
+    [Test]
+    public void CanJump_ReturnsFalse_WhenGroundCheckDisabled()
+    {
+        var state = new JumpState(groundCheckEnabled: false);
+
+        Assert.That(state.CanJump(isGrounded: true), Is.False);
+    }
+}
 ```
 
 **Verify RED**
-```bash
-$ npm test
-FAIL: expected 'Email required', got undefined
+```text
+run_tests(EditMode, test_names: JumpStateTests.CanJump_ReturnsFalse_WhenGroundCheckDisabled)
+Expected: FAIL because `CanJump` ignores `groundCheckEnabled`
 ```
 
 **GREEN**
-```typescript
-function submitForm(data: FormData) {
-  if (!data.email?.trim()) {
-    return { error: 'Email required' };
-  }
-  // ...
+```csharp
+public sealed class JumpState
+{
+    private readonly bool groundCheckEnabled;
+
+    public JumpState(bool groundCheckEnabled)
+    {
+        this.groundCheckEnabled = groundCheckEnabled;
+    }
+
+    public bool CanJump(bool isGrounded)
+    {
+        return groundCheckEnabled && isGrounded;
+    }
 }
 ```
 
 **Verify GREEN**
-```bash
-$ npm test
-PASS
+```text
+run_tests(EditMode, test_names: JumpStateTests.CanJump_ReturnsFalse_WhenGroundCheckDisabled)
+Expected: PASS
 ```
 
 **REFACTOR**
@@ -377,8 +392,8 @@ When adding mocks or test utilities, read @testing-anti-patterns.md to avoid com
 ## Final Rule
 
 ```
-Production code → test exists and failed first
-Otherwise → not TDD
+Production code -> test exists and failed first
+Otherwise -> not TDD
 ```
 
 No exceptions without your human partner's permission.

@@ -56,8 +56,8 @@ WHY: Items may be related. Partial understanding = wrong implementation.
 your human partner: "Fix 1-6"
 You understand 1,2,3,6. Unclear on 4,5.
 
-❌ WRONG: Implement 1,2,3,6 now, ask about 4,5 later
-✅ RIGHT: "I understand items 1,2,3,6. Need clarification on 4 and 5 before proceeding."
+BAD WRONG: Implement 1,2,3,6 now, ask about 4,5 later
+OK RIGHT: "I understand items 1,2,3,6. Need clarification on 4 and 5 before proceeding."
 ```
 
 ## Source-Specific Handling
@@ -136,15 +136,15 @@ Push back when:
 
 When feedback IS correct:
 ```
-✅ "Fixed. [Brief description of what changed]"
-✅ "Good catch - [specific issue]. Fixed in [location]."
-✅ [Just fix it and show in the code]
+OK "Fixed. [Brief description of what changed]"
+OK "Good catch - [specific issue]. Fixed in [location]."
+OK [Just fix it and show in the code]
 
-❌ "You're absolutely right!"
-❌ "Great point!"
-❌ "Thanks for catching that!"
-❌ "Thanks for [anything]"
-❌ ANY gratitude expression
+BAD "You're absolutely right!"
+BAD "Great point!"
+BAD "Thanks for catching that!"
+BAD "Thanks for [anything]"
+BAD ANY gratitude expression
 ```
 
 **Why no thanks:** Actions speak. Just fix it. The code itself shows you heard the feedback.
@@ -155,12 +155,12 @@ When feedback IS correct:
 
 If you pushed back and were wrong:
 ```
-✅ "You were right - I checked [X] and it does [Y]. Implementing now."
-✅ "Verified this and you're correct. My initial understanding was wrong because [reason]. Fixing."
+OK "You were right - I checked [X] and it does [Y]. Implementing now."
+OK "Verified this and you're correct. My initial understanding was wrong because [reason]. Fixing."
 
-❌ Long apology
-❌ Defending why you pushed back
-❌ Over-explaining
+BAD Long apology
+BAD Defending why you pushed back
+BAD Over-explaining
 ```
 
 State the correction factually and move on.
@@ -181,27 +181,27 @@ State the correction factually and move on.
 
 **Performative Agreement (Bad):**
 ```
-Reviewer: "Remove legacy code"
-❌ "You're absolutely right! Let me remove that..."
+Reviewer: "Delete the fallback serialized field"
+Bad: "You're absolutely right. Let me remove that."
 ```
 
 **Technical Verification (Good):**
 ```
-Reviewer: "Remove legacy code"
-✅ "Checking... build target is 10.15+, this API needs 13+. Need legacy for backward compat. Current impl has wrong bundle ID - fix it or drop pre-13 support?"
+Reviewer: "Delete the fallback serialized field"
+Good: "Checking prefab usage first. Assets/Prefabs/Enemy.prefab still has that field wired for the legacy attack clip. We can remove it only after migrating the prefab reference or dropping legacy clip support."
 ```
 
 **YAGNI (Good):**
 ```
-Reviewer: "Implement proper metrics tracking with database, date filters, CSV export"
-✅ "Grepped codebase - nothing calls this endpoint. Remove it (YAGNI)? Or is there usage I'm missing?"
+Reviewer: "Add pooling, Addressables, and analytics for this prototype pickup"
+Good: "Current spec only needs a scene-local pickup. No repeated spawning or remote loading yet. Recommend keeping pooling/Addressables/analytics out unless you want to expand scope."
 ```
 
 **Unclear Item (Good):**
 ```
 your human partner: "Fix items 1-6"
 You understand 1,2,3,6. Unclear on 4,5.
-✅ "Understand 1,2,3,6. Need clarification on 4 and 5 before implementing."
+Good: "Understand 1,2,3,6. Need clarification on 4 and 5 before changing scenes or prefabs."
 ```
 
 ## GitHub Thread Replies

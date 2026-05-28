@@ -16,6 +16,16 @@ Task tool (general-purpose):
 
     [Scene-setting: where this fits, dependencies, architectural context]
 
+    ## Unity Context
+
+    Include any relevant Unity surfaces from the plan:
+    - Unity project path and active worktree path
+    - MCPForUnity target identity requirements
+    - scene, prefab, ScriptableObject, material, animation, input, package, asmdef, ProjectSettings, and `.meta` surfaces
+    - required serialized field wiring and expected object references
+    - required EditMode, PlayMode, console, compile/domain reload, scene smoke, prefab smoke, or manual verification evidence
+    - related `docs/solutions/` findings or project architecture notes
+
     ## Before You Begin
 
     If you have questions about:
@@ -31,10 +41,11 @@ Task tool (general-purpose):
     Once you're clear on requirements:
     1. Implement exactly what the task specifies
     2. Write tests (following TDD if task says to)
-    3. Verify implementation works
-    4. Commit your work
-    5. Self-review (see below)
-    6. Report back
+    3. Wire Unity scenes, prefabs, assets, serialized fields, packages, or settings exactly as specified
+    4. Verify implementation works with the task's Unity evidence
+    5. Commit your work
+    6. Self-review (see below)
+    7. Report back
 
     Work from: [directory]
 
@@ -48,7 +59,7 @@ Task tool (general-purpose):
     - Follow the file structure defined in the plan
     - Each file should have one clear responsibility with a well-defined interface
     - If a file you're creating is growing beyond the plan's intent, stop and report
-      it as DONE_WITH_CONCERNS — don't split files on your own without plan guidance
+      it as DONE_WITH_CONCERNS; do not split files on your own without plan guidance
     - If an existing file you're modifying is already large or tangled, work carefully
       and note it as a concern in your report
     - In existing codebases, follow established patterns. Improve code you're touching
@@ -95,6 +106,13 @@ Task tool (general-purpose):
     - Did I follow TDD if required?
     - Are tests comprehensive?
 
+    **Unity evidence:**
+    - Did I verify MCPForUnity target identity when Editor work was involved?
+    - Did I wait for compile/domain reload and read the Unity console when scripts or assets changed?
+    - Did I verify required EditMode/PlayMode tests or explain why automation is infeasible?
+    - Did I inspect changed scenes, prefabs, ScriptableObjects, packages, asmdefs, and `.meta` files when relevant?
+    - Did I avoid claiming runtime or Editor verification from file-state checks alone?
+
     If you find issues during self-review, fix them now before reporting.
 
     ## Report Format
@@ -103,6 +121,7 @@ Task tool (general-purpose):
     - **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
     - What you implemented (or what you attempted, if blocked)
     - What you tested and test results
+    - Unity evidence gathered, including MCPForUnity target, console, tests, scene/prefab smoke, or explicit limitations
     - Files changed
     - Self-review findings (if any)
     - Any issues or concerns

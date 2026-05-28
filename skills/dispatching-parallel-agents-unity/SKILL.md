@@ -1,186 +1,182 @@
 ---
 name: dispatching-parallel-agents-unity
-description: Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies
+description: Use when facing 2+ independent Unity tasks that can be worked on without shared scene, prefab, asset, package, or serialized state
 ---
 
 # Dispatching Parallel Agents
 
 ## Overview
 
-You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
+You delegate independent Unity problem domains to specialized agents with isolated context. Each agent gets the exact files, Unity surfaces, verification command, and expected return format it needs.
 
-When you have multiple unrelated failures (different test files, different subsystems, different bugs), investigating them sequentially wastes time. Each investigation is independent and can happen in parallel.
+**Core principle:** Dispatch one agent per independent Unity surface. Do not parallelize shared serialized state.
 
 ## Unity Parallelism Rule
 
-Parallelize only independent Unity surfaces. It is safe to split pure C# runtime code, editor tooling, tests, docs, and validation scripts when file ownership is disjoint. Do not parallelize edits to the same scene, prefab, ScriptableObject asset, `.meta`, package file, ProjectSettings file, or asmdef.
+Parallelize only independent Unity surfaces:
 
-**Core principle:** Dispatch one agent per independent problem domain. Let them work concurrently.
+- Safe in parallel: pure C# runtime code in disjoint files, editor tooling in disjoint files, docs, tests that do not share fixtures, validation scripts.
+- Usually sequential: `.unity`, `.prefab`, `.asset`, `.meta`, `Packages/manifest.json`, `Packages/packages-lock.json`, `ProjectSettings/`, asmdefs, Animator controllers, input actions.
+- Integration tasks that wire scene/prefab/asset references should run after code tasks are reviewed.
+
+If two agents may touch the same Unity asset or serialized reference graph, do not dispatch them in parallel.
 
 ## When to Use
 
 ```dot
 digraph when_to_use {
-    "Multiple failures?" [shape=diamond];
-    "Are they independent?" [shape=diamond];
+    "Multiple Unity tasks or failures?" [shape=diamond];
+    "Independent surfaces?" [shape=diamond];
+    "Shared scene/prefab/asset/package state?" [shape=diamond];
     "Single agent investigates all" [shape=box];
-    "One agent per problem domain" [shape=box];
-    "Can they work in parallel?" [shape=diamond];
     "Sequential agents" [shape=box];
     "Parallel dispatch" [shape=box];
 
-    "Multiple failures?" -> "Are they independent?" [label="yes"];
-    "Are they independent?" -> "Single agent investigates all" [label="no - related"];
-    "Are they independent?" -> "Can they work in parallel?" [label="yes"];
-    "Can they work in parallel?" -> "Parallel dispatch" [label="yes"];
-    "Can they work in parallel?" -> "Sequential agents" [label="no - shared state"];
+    "Multiple Unity tasks or failures?" -> "Independent surfaces?" [label="yes"];
+    "Independent surfaces?" -> "Single agent investigates all" [label="no"];
+    "Independent surfaces?" -> "Shared scene/prefab/asset/package state?" [label="yes"];
+    "Shared scene/prefab/asset/package state?" -> "Sequential agents" [label="yes"];
+    "Shared scene/prefab/asset/package state?" -> "Parallel dispatch" [label="no"];
 }
 ```
 
 **Use when:**
-- 3+ test files failing with different root causes
-- Multiple subsystems broken independently
-- Each problem can be understood without context from others
-- No shared state between investigations
+- One agent can fix pure C# movement math while another updates UI Toolkit USS.
+- One agent can inspect an EditMode test failure while another investigates package documentation.
+- Multiple compile errors are in unrelated asmdefs or disjoint scripts.
+- Documentation, validation scripts, and source analysis can run without touching Unity serialized assets.
 
-**Don't use when:**
-- Failures are related (fix one might fix others)
-- Need to understand full system state
-- Agents would interfere with each other
+**Do not use when:**
+- Tasks share a scene, prefab, ScriptableObject, `.meta`, package manifest, ProjectSettings, input actions, or Animator controller.
+- One task's result decides another task's design.
+- You need one coherent root-cause investigation.
 
 ## The Pattern
 
 ### 1. Identify Independent Domains
 
-Group failures by what's broken:
-- File A tests: Tool approval flow
-- File B tests: Batch completion behavior
-- File C tests: Abort functionality
+Group by Unity ownership:
 
-Each domain is independent - fixing tool approval doesn't affect abort tests.
+- Domain A: `Assets/Scripts/Movement/` pure C# and EditMode tests.
+- Domain B: `Assets/Scripts/UI/` UI Toolkit controller and USS.
+- Domain C: docs or source analysis.
+
+Do not group by "easy vs hard"; group by ownership and conflict risk.
 
 ### 2. Create Focused Agent Tasks
 
 Each agent gets:
-- **Specific scope:** One test file or subsystem
-- **Clear goal:** Make these tests pass
-- **Constraints:** Don't change other code
-- **Expected output:** Summary of what you found and fixed
+
+- **Specific scope:** exact files, folders, tests, scenes, prefabs, or assets.
+- **Clear goal:** the behavior or failure to resolve.
+- **Constraints:** files and Unity surfaces it must not touch.
+- **Evidence:** exact EditMode, PlayMode, console, scene smoke, prefab smoke, or file-only limitation.
+- **Expected output:** root cause, changes, evidence, files touched, concerns.
 
 ### 3. Dispatch in Parallel
 
-```typescript
-// In Claude Code / AI environment
-Task("Fix agent-tool-abort.test.ts failures")
-Task("Fix batch-completion-behavior.test.ts failures")
-Task("Fix tool-approval-race-conditions.test.ts failures")
-// All three run concurrently
+Example parallel-safe dispatch:
+
+```text
+Agent 1: Fix `Assets/Tests/EditMode/Movement/MovementMathTests.cs` and `Assets/Scripts/Movement/MovementMath.cs`.
+Agent 2: Review `Assets/Scripts/UI/HudPresenter.cs` and `Assets/UI/Hud.uxml` for binding mismatch. Do not edit scenes or prefabs.
+Agent 3: Search `docs/solutions/` for prior Input System setup failures and summarize relevant guidance.
 ```
 
 ### 4. Review and Integrate
 
 When agents return:
-- Read each summary
-- Verify fixes don't conflict
-- Run full test suite
-- Integrate all changes
+
+- Read each summary and touched-file list.
+- Check for conflicts in code and serialized Unity assets.
+- Run combined verification: compile/domain reload, console, relevant EditMode/PlayMode tests, scene/prefab smoke where affected.
+- Integrate sequentially if any scene, prefab, package, ProjectSettings, or `.meta` change appears.
 
 ## Agent Prompt Structure
 
-Good agent prompts are:
-1. **Focused** - One clear problem domain
-2. **Self-contained** - All context needed to understand the problem
-3. **Specific about output** - What should the agent return?
+Good Unity parallel-agent prompts are:
+
+1. **Focused** - one clear problem domain.
+2. **Self-contained** - all context needed to understand the task.
+3. **Explicit about forbidden surfaces** - name what not to touch.
+4. **Evidence-driven** - specify exactly what proof to gather.
 
 ```markdown
-Fix the 3 failing tests in src/agents/agent-tool-abort.test.ts:
+Investigate the failing EditMode tests in `Assets/Tests/EditMode/Movement/MovementMathTests.cs`.
 
-1. "should abort tool with partial output capture" - expects 'interrupted at' in message
-2. "should handle mixed completed and aborted tools" - fast tool aborted instead of completed
-3. "should properly track pendingToolCount" - expects 3 results but gets 0
+Scope:
+- You may edit `Assets/Scripts/Movement/MovementMath.cs`
+- You may edit `Assets/Tests/EditMode/Movement/MovementMathTests.cs`
+- Do not edit scenes, prefabs, ScriptableObjects, packages, ProjectSettings, or `.meta` files
 
-These are timing/race condition issues. Your task:
+Goal:
+- Find whether the failure is a test expectation issue or movement math bug
+- Fix the root cause only
+- Verify with the targeted EditMode test
 
-1. Read the test file and understand what each test verifies
-2. Identify root cause - timing issues or actual bugs?
-3. Fix by:
-   - Replacing arbitrary timeouts with event-based waiting
-   - Fixing bugs in abort implementation if found
-   - Adjusting test expectations if testing changed behavior
-
-Do NOT just increase timeouts - find the real issue.
-
-Return: Summary of what you found and what you fixed.
+Return:
+- Root cause
+- Files changed
+- Test command and result
+- Any limitations
 ```
 
 ## Common Mistakes
 
-**❌ Too broad:** "Fix all the tests" - agent gets lost
-**✅ Specific:** "Fix agent-tool-abort.test.ts" - focused scope
+**Too broad:** "Fix all Unity test failures" - agent gets lost.
+**Specific:** "Fix `MovementMathTests` only; do not touch scenes or prefabs."
 
-**❌ No context:** "Fix the race condition" - agent doesn't know where
-**✅ Context:** Paste the error messages and test names
+**No Unity surface constraints:** Agent may edit a prefab while another agent edits the same prefab.
+**Good constraints:** "Do not edit `.unity`, `.prefab`, `.asset`, `.meta`, `Packages/`, or `ProjectSettings/`."
 
-**❌ No constraints:** Agent might refactor everything
-**✅ Constraints:** "Do NOT change production code" or "Fix tests only"
-
-**❌ Vague output:** "Fix it" - you don't know what changed
-**✅ Specific:** "Return summary of root cause and changes"
+**Vague evidence:** "Verify it works."
+**Specific evidence:** "Run the targeted EditMode test and read the Unity console after refresh."
 
 ## When NOT to Use
 
-**Related failures:** Fixing one might fix others - investigate together first
-**Need full context:** Understanding requires seeing entire system
-**Exploratory debugging:** You don't know what's broken yet
-**Shared state:** Agents would interfere (editing same files, using same resources)
+- Related failures where one scene/prefab wiring error may explain everything.
+- Shared Unity serialized assets.
+- Package or ProjectSettings changes.
+- Exploratory debugging where root cause is unknown and may cross layers.
+- Runtime behavior requiring one active Unity Editor state.
 
-## Real Example from Session
+## Real Unity Example
 
-**Scenario:** 6 test failures across 3 files after major refactoring
+**Scenario:** 5 failures after adding player interaction:
 
-**Failures:**
-- agent-tool-abort.test.ts: 3 failures (timing issues)
-- batch-completion-behavior.test.ts: 2 failures (tools not executing)
-- tool-approval-race-conditions.test.ts: 1 failure (execution count = 0)
+- `InteractionRangeTests`: pure C# range math failed.
+- `HudBindingTests`: UI Toolkit binding path failed.
+- `PlayerInteractionPlayModeTests`: scene wiring missing.
 
-**Decision:** Independent domains - abort logic separate from batch completion separate from race conditions
+**Decision:**
+
+- Dispatch range math and HUD binding in parallel.
+- Keep PlayMode scene wiring sequential after both code tasks return.
 
 **Dispatch:**
+
+```text
+Agent 1 -> Fix range math tests only
+Agent 2 -> Fix HUD binding tests only
+Agent 3 -> Search docs/solutions for Input System interaction lessons
 ```
-Agent 1 → Fix agent-tool-abort.test.ts
-Agent 2 → Fix batch-completion-behavior.test.ts
-Agent 3 → Fix tool-approval-race-conditions.test.ts
+
+**Sequential integration:**
+
+```text
+Controller -> Wire scene/prefab references after Agent 1 and Agent 2 pass review
+Controller -> Run PlayMode scene smoke and console check
 ```
-
-**Results:**
-- Agent 1: Replaced timeouts with event-based waiting
-- Agent 2: Fixed event structure bug (threadId in wrong place)
-- Agent 3: Added wait for async tool execution to complete
-
-**Integration:** All fixes independent, no conflicts, full suite green
-
-**Time saved:** 3 problems solved in parallel vs sequentially
-
-## Key Benefits
-
-1. **Parallelization** - Multiple investigations happen simultaneously
-2. **Focus** - Each agent has narrow scope, less context to track
-3. **Independence** - Agents don't interfere with each other
-4. **Speed** - 3 problems solved in time of 1
 
 ## Verification
 
 After agents return:
-1. **Review each summary** - Understand what changed
-2. **Check for conflicts** - Did agents edit same code?
-3. **Run full suite** - Verify all fixes work together
-4. **Spot check** - Agents can make systematic errors
+
+1. Review each summary and touched-file list.
+2. Confirm no conflicting Unity serialized asset edits.
+3. Run combined tests and Unity console check.
+4. Inspect affected scenes, prefabs, assets, packages, and `.meta` files if any changed.
 
 ## Real-World Impact
 
-From debugging session (2025-10-03):
-- 6 failures across 3 files
-- 3 agents dispatched in parallel
-- All investigations completed concurrently
-- All fixes integrated successfully
-- Zero conflicts between agent changes
+Parallel agents are useful for Unity only when ownership is explicit. Without ownership boundaries, the speed gain is lost to scene, prefab, asset, and `.meta` conflicts.

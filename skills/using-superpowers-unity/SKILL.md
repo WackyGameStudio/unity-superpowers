@@ -149,6 +149,12 @@ Examples:
 - "Implement this approved plan" -> `subagent-driven-development-unity` when subagents are available, otherwise `executing-plans-unity`.
 - "Is this done?" -> `verification-before-completion-unity`.
 
+Handoff expectations:
+
+- After `brainstorming-unity` writes the spec, ask whether to proceed to `writing-plans-unity`.
+- After `writing-plans-unity` writes the plan, ask whether to run `using-git-worktrees-unity` and then execute with `subagent-driven-development-unity` or `executing-plans-unity`.
+- Before any plan execution, `using-git-worktrees-unity` must set up or verify isolation, unless the user explicitly approves working in place.
+
 ## Skill Types
 
 **Rigid**: `test-driven-development-unity`, `systematic-debugging-unity`, `verification-before-completion-unity`. Follow exactly.

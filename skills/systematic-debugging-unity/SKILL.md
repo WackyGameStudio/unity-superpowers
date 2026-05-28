@@ -85,16 +85,16 @@ You MUST complete each phase before proceeding to the next.
    - New dependencies, config changes
    - Environmental differences
 
-4. **Gather Evidence in Multi-Component Systems**
+4. **Gather Evidence in Multi-Component Unity Systems**
 
-   **WHEN system has multiple components (CI -> build -> signing, API -> service -> database):**
+   **WHEN the issue crosses multiple Unity layers (input -> controller -> motor -> physics, prefab -> scene -> runtime, package -> asmdef -> compile, animation event -> Animator -> gameplay state):**
 
    **BEFORE proposing fixes, add diagnostic instrumentation:**
    ```
    For EACH component boundary:
      - Log what data enters component
      - Log what data exits component
-     - Verify environment/config propagation
+     - Verify serialized references, package state, or configuration propagation
      - Check state at each layer
 
    Run once to gather evidence showing WHERE it breaks
@@ -102,26 +102,16 @@ You MUST complete each phase before proceeding to the next.
    THEN investigate that specific component
    ```
 
-   **Example (multi-layer system):**
-   ```bash
-   # Layer 1: Workflow
-   echo "=== Secrets available in workflow: ==="
-   echo "IDENTITY: ${IDENTITY:+SET}${IDENTITY:-UNSET}"
-
-   # Layer 2: Build script
-   echo "=== Env vars in build script: ==="
-   env | grep IDENTITY || echo "IDENTITY not in environment"
-
-   # Layer 3: Signing script
-   echo "=== Keychain state: ==="
-   security list-keychains
-   security find-identity -v
-
-   # Layer 4: Actual signing
-   codesign --sign "$IDENTITY" --verbose=4 "$APP"
+   **Example (Unity input-to-motion path):**
+   ```text
+   Layer 1: Input action fires? Check `PlayerInput` action map and callback.
+   Layer 2: Controller receives value? Log normalized move vector.
+   Layer 3: Motor receives command? Log velocity request before physics.
+   Layer 4: Rigidbody/CharacterController moves? Inspect position after FixedUpdate.
+   Layer 5: Animator/VFX reflects state? Inspect Animator parameters and events.
    ```
 
-   **This reveals:** Which layer fails (secrets -> workflow -> build -> signing).
+   **This reveals:** Which layer fails (input -> controller -> motor -> physics -> feedback).
 
 5. **Trace Data Flow**
 

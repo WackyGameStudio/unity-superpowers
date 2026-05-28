@@ -2,114 +2,116 @@
 
 ## Overview
 
-Flaky tests often guess at timing with arbitrary delays. This creates race conditions where tests pass on fast machines but fail under load or in CI.
+Flaky Unity tests often guess at timing with `WaitForSeconds`, fixed frame counts, or external sleeps. This creates race conditions where tests pass locally but fail under load, in CI, or after minor frame-rate changes.
 
-**Core principle:** Wait for the actual condition you care about, not a guess about how long it takes.
+**Core principle:** Wait for the Unity condition you care about, not a guess about how long it takes.
 
 ## When to Use
 
 ```dot
 digraph when_to_use {
-    "Test uses setTimeout/sleep?" [shape=diamond];
+    "Unity test uses arbitrary wait?" [shape=diamond];
     "Testing timing behavior?" [shape=diamond];
-    "Document WHY timeout needed" [shape=box];
+    "Document WHY timeout is needed" [shape=box];
     "Use condition-based waiting" [shape=box];
 
-    "Test uses setTimeout/sleep?" -> "Testing timing behavior?" [label="yes"];
-    "Testing timing behavior?" -> "Document WHY timeout needed" [label="yes"];
+    "Unity test uses arbitrary wait?" -> "Testing timing behavior?" [label="yes"];
+    "Testing timing behavior?" -> "Document WHY timeout is needed" [label="yes"];
     "Testing timing behavior?" -> "Use condition-based waiting" [label="no"];
 }
 ```
 
 **Use when:**
-- Tests have arbitrary delays (`setTimeout`, `sleep`, `time.sleep()`)
-- Tests are flaky (pass sometimes, fail under load)
+- Tests have arbitrary waits (`WaitForSeconds`, polling sleeps, fixed frame counts)
+- Tests are flaky
 - Tests timeout when run in parallel
-- Waiting for async operations to complete
+- Waiting for scene loading, physics settling, animation states, object spawning, addressable loads, or async operations
 
 **Don't use when:**
-- Testing actual timing behavior (debounce, throttle intervals)
-- Always document WHY if using arbitrary timeout
+- Testing actual timing behavior such as invulnerability windows, cooldowns, transition durations, debounce, or throttle intervals
+- A fixed wait is tied to a designed duration and documented
 
 ## Core Pattern
 
-```typescript
-// ❌ BEFORE: Guessing at timing
-await new Promise(r => setTimeout(r, 50));
-const result = getResult();
-expect(result).toBeDefined();
+```csharp
+// BAD: Guessing at frame timing.
+yield return new WaitForSeconds(0.2f);
+Assert.IsTrue(playerMotor.IsGrounded);
 
-// ✅ AFTER: Waiting for condition
-await waitFor(() => getResult() !== undefined);
-const result = getResult();
-expect(result).toBeDefined();
+// GOOD: Waiting for the actual condition.
+yield return UnityConditionWait.Until(
+    () => playerMotor.IsGrounded,
+    "player to become grounded after spawn");
+Assert.IsTrue(playerMotor.IsGrounded);
 ```
 
 ## Quick Patterns
 
 | Scenario | Pattern |
 |----------|---------|
-| Wait for event | `waitFor(() => events.find(e => e.type === 'DONE'))` |
-| Wait for state | `waitFor(() => machine.state === 'ready')` |
-| Wait for count | `waitFor(() => items.length >= 5)` |
-| Wait for file | `waitFor(() => fs.existsSync(path))` |
-| Complex condition | `waitFor(() => obj.ready && obj.value > 10)` |
+| Wait for scene object | `yield return UnityConditionWait.UntilObjectExists("Player")` |
+| Wait for physics state | `yield return UnityConditionWait.Until(() => motor.IsGrounded, "player grounded")` |
+| Wait for animation | `yield return UnityConditionWait.UntilAnimatorState(animator, "JumpLand")` |
+| Wait for component state | `yield return UnityConditionWait.Until(() => health.Current <= 0, "enemy death")` |
+| Wait for async operation | `yield return UnityConditionWait.Until(() => operation.isDone, "asset load")` |
 
 ## Implementation
 
-Generic polling function:
-```typescript
-async function waitFor<T>(
-  condition: () => T | undefined | null | false,
-  description: string,
-  timeoutMs = 5000
-): Promise<T> {
-  const startTime = Date.now();
+Generic UnityTest polling function:
 
-  while (true) {
-    const result = condition();
-    if (result) return result;
+```csharp
+public static IEnumerator Until(
+    Func<bool> condition,
+    string description,
+    float timeoutSeconds = 5f)
+{
+    var start = Time.realtimeSinceStartup;
 
-    if (Date.now() - startTime > timeoutMs) {
-      throw new Error(`Timeout waiting for ${description} after ${timeoutMs}ms`);
+    while (!condition())
+    {
+        if (Time.realtimeSinceStartup - start > timeoutSeconds)
+        {
+            Assert.Fail($"Timeout waiting for {description}");
+        }
+
+        yield return null;
     }
-
-    await new Promise(r => setTimeout(r, 10)); // Poll every 10ms
-  }
 }
 ```
 
-See `condition-based-waiting-example.ts` in this directory for complete implementation with domain-specific helpers (`waitForEvent`, `waitForEventCount`, `waitForEventMatch`) from actual debugging session.
+See `condition-based-waiting-example.cs` in this directory for Unity helpers.
 
 ## Common Mistakes
 
-**❌ Polling too fast:** `setTimeout(check, 1)` - wastes CPU
-**✅ Fix:** Poll every 10ms
+**BAD: Tight polling:** `while (!done) { }` freezes the runner.
+**Fix:** Yield each frame or use a justified interval.
 
-**❌ No timeout:** Loop forever if condition never met
-**✅ Fix:** Always include timeout with clear error
+**BAD: No timeout:** Coroutine loops forever when the condition never happens.
+**Fix:** Always include a timeout with a clear error.
 
-**❌ Stale data:** Cache state before loop
-**✅ Fix:** Call getter inside loop for fresh data
+**BAD: Stale data:** Cache component state before the loop.
+**Fix:** Read the current state inside the condition.
+
+**BAD: Editor/runtime mismatch:** EditMode proof is used for physics or animation behavior.
+**Fix:** Use PlayMode tests or a runtime smoke test when engine timing matters.
 
 ## When Arbitrary Timeout IS Correct
 
-```typescript
-// Tool ticks every 100ms - need 2 ticks to verify partial output
-await waitForEvent(manager, 'TOOL_STARTED'); // First: wait for condition
-await new Promise(r => setTimeout(r, 200));   // Then: wait for timed behavior
-// 200ms = 2 ticks at 100ms intervals - documented and justified
+```csharp
+// Animator transition has a designed 0.15s exit time.
+yield return UnityConditionWait.UntilAnimatorState(animator, "AttackStart");
+yield return new WaitForSeconds(0.2f);
+Assert.IsTrue(animator.GetCurrentAnimatorStateInfo(0).IsName("AttackRecover"));
 ```
 
 **Requirements:**
-1. First wait for triggering condition
-2. Based on known timing (not guessing)
-3. Comment explaining WHY
+1. First wait for the triggering condition.
+2. Base the duration on known Unity behavior or authored content.
+3. Add a comment explaining why the fixed wait exists.
 
 ## Real-World Impact
 
-From debugging session (2025-10-03):
-- Fixed 15 flaky tests across 3 files
-- Pass rate: 60% → 100%
-- Execution time: 40% faster
-- No more race conditions
+From Unity debugging sessions:
+- Flaky PlayMode tests become tied to scene state instead of frame-rate guesses
+- Failures report the missing Unity condition directly
+- Runtime smoke tests stop depending on local machine speed

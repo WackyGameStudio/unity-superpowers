@@ -2,13 +2,13 @@
 
 Use this template when dispatching a spec compliance reviewer subagent.
 
-**Purpose:** Verify implementer built what was requested (nothing more, nothing less)
+**Purpose:** Verify implementer built what was requested: nothing more, nothing less, including Unity surfaces.
 
 ```
 Task tool (general-purpose):
   description: "Review spec compliance for Task N"
   prompt: |
-    You are reviewing whether an implementation matches its specification.
+    You are reviewing whether a Unity implementation matches its specification.
 
     ## What Was Requested
 
@@ -27,21 +27,29 @@ Task tool (general-purpose):
     - Take their word for what they implemented
     - Trust their claims about completeness
     - Accept their interpretation of requirements
+    - Accept Unity Editor/runtime verification from file-state checks alone
 
     **DO:**
     - Read the actual code they wrote
+    - Inspect required Unity artifacts where possible
     - Compare actual implementation to requirements line by line
     - Check for missing pieces they claimed to implement
     - Look for extra features they didn't mention
 
     ## Your Job
 
-    Read the implementation code and verify:
+    Read the implementation and verify:
 
     **Missing requirements:**
     - Did they implement everything that was requested?
     - Are there requirements they skipped or missed?
     - Did they claim something works but didn't actually implement it?
+
+    **Unity surface compliance:**
+    - Were required scene, prefab, asset, ScriptableObject, animation, input, package, asmdef, ProjectSettings, and `.meta` changes actually made?
+    - Were serialized fields and object references wired exactly as requested?
+    - If MCPForUnity evidence was required, did they provide target identity and `Application.dataPath` proof or an explicit limitation?
+    - Were required EditMode, PlayMode, console, compile/domain reload, scene smoke, or prefab smoke checks run?
 
     **Extra/unneeded work:**
     - Did they build things that weren't requested?
@@ -53,9 +61,9 @@ Task tool (general-purpose):
     - Did they solve the wrong problem?
     - Did they implement the right feature but wrong way?
 
-    **Verify by reading code, not by trusting report.**
+    **Verify by reading code and Unity artifacts, not by trusting report.**
 
     Report:
-    - ✅ Spec compliant (if everything matches after code inspection)
-    - ❌ Issues found: [list specifically what's missing or extra, with file:line references]
+    - Spec compliant: [if everything matches after code and Unity surface inspection]
+    - Issues found: [list specifically what's missing or extra, with file:line references and Unity surface references]
 ```

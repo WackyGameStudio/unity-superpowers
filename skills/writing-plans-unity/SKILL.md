@@ -262,20 +262,24 @@ If you find issues, fix them inline. If a design requirement has no task, add th
 
 ## Execution Handoff
 
-After saving the plan, offer execution choice:
+After saving the plan, offer execution choice. This handoff MUST make the worktree step visible, because Unity scenes, prefabs, packages, and `.meta` files are risky to edit on the user's current branch.
 
 **"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Two execution options:**
 
-**1. Subagent-Driven (recommended)** - I dispatch a fresh subagent per task, review between tasks, fast iteration
+**1. Worktree + Subagent-Driven (recommended)** - I use `using-git-worktrees-unity` to set up or verify an isolated workspace, then dispatch a fresh subagent per task with review between tasks
 
-**2. Inline Execution** - Execute tasks in this session using executing-plans-unity, batch execution with checkpoints
+**2. Worktree + Inline Execution** - I use `using-git-worktrees-unity` to set up or verify an isolated workspace, then execute tasks in this session using `executing-plans-unity` with checkpoints
 
 **Which approach?"**
 
+Use the user's conversation language for the actual question. Keep skill names and plan path unchanged.
+
 **If Subagent-Driven chosen:**
+- **REQUIRED SUB-SKILL FIRST:** Use using-git-worktrees-unity
 - **REQUIRED SUB-SKILL:** Use subagent-driven-development-unity
 - Fresh subagent per task + two-stage review
 
 **If Inline Execution chosen:**
+- **REQUIRED SUB-SKILL FIRST:** Use using-git-worktrees-unity
 - **REQUIRED SUB-SKILL:** Use executing-plans-unity
 - Batch execution with checkpoints for review
