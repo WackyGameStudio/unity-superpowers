@@ -40,6 +40,14 @@ Steps:
 4. If `<target-project>/AGENTS.md` already exists, merge the Unity Superpowers sections into it without deleting project-specific rules.
 5. Tell the user to restart or refresh Codex if the new skills do not appear immediately.
 
+Codex skill discovery is session-scoped. If `using-superpowers-unity` or another Unity Superpowers skill does not appear, verify the copied path first:
+
+```text
+<target-project>/.agents/skills/using-superpowers-unity/SKILL.md
+```
+
+If the file exists, start a new Codex session or refresh Codex so it reloads project-local skills. If the file does not exist, the package was not installed into the active project.
+
 ## Claude Code Install
 
 For Claude Code project-local installation, prefer the project guidance file that Claude Code reads in that project.
