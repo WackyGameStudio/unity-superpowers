@@ -24,6 +24,12 @@ Pick the narrowest meaningful failing evidence before implementation:
 - scene smoke for hierarchy, camera, lighting, object placement, or runtime composition
 - manual evidence only when Unity automation cannot observe the behavior, with the reason stated before implementation
 
+For Unity architecture, prefer tests at the lowest stable boundary:
+
+- Pure C# for math, transition rules, strategy decisions, and data transforms.
+- EditMode for `ScriptableObject` defaults, serialized component validation, editor utilities, and prefab asset checks.
+- PlayMode for physics, animation, coroutines, Input System flow, lifecycle ordering, and scene startup.
+
 If implementation code was written before the failing evidence and an automated test is feasible, delete or isolate that implementation and restart from the failing evidence.
 
 ## When to Use
@@ -111,12 +117,12 @@ Clear name, tests real behavior, one thing
 [Test]
 public void Movement_Works()
 {
-    var motor = new MockPlayerMotor();
-    motor.Move(Vector3.right);
-    Assert.That(motor.MoveWasCalled, Is.True);
+    var velocity = Vector3.right;
+
+    Assert.That(velocity, Is.Not.EqualTo(Vector3.zero));
 }
 ```
-Vague name, tests mock state instead of behavior
+Vague name, only proves test setup
 </Bad>
 
 **Requirements:**
@@ -162,12 +168,14 @@ Just enough to pass
 
 <Bad>
 ```csharp
+using UnityEngine;
+
 public sealed class AdvancedMovementPipeline : MonoBehaviour
 {
     public AnimationCurve accelerationCurve;
     public AudioSource footstepSource;
     public ParticleSystem dust;
-    public UnityEvent onSpeedChanged;
+    public float currentSpeed;
 
     // YAGNI for a velocity clamp test.
 }
@@ -214,6 +222,86 @@ Next failing test for next feature.
 | **Minimal** | One thing. "and" in name? Split it. | `test('validates email and domain and whitespace')` |
 | **Clear** | Name describes behavior | `test('test1')` |
 | **Shows intent** | Demonstrates desired API | Obscures what code should do |
+
+## Unity Boundary Examples
+
+### ScriptableObject Defaults
+
+Use EditMode tests for designer-tunable data assets and default values.
+
+```csharp
+using NUnit.Framework;
+using UnityEngine;
+
+public sealed class AgentStatsTests
+{
+    [Test]
+    public void DefaultMaxSpeed_IsPositive()
+    {
+        var stats = ScriptableObject.CreateInstance<AgentStats>();
+
+        try
+        {
+            Assert.That(stats.MaxSpeed, Is.GreaterThan(0f));
+        }
+        finally
+        {
+            UnityEngine.Object.DestroyImmediate(stats);
+        }
+    }
+}
+
+[CreateAssetMenu(menuName = "Game/Agent Stats")]
+public sealed class AgentStats : ScriptableObject
+{
+    [SerializeField] private float maxSpeed = 4f;
+    public float MaxSpeed => maxSpeed;
+}
+```
+
+### Transition Rules
+
+Test state transitions as pure C# where possible. This matches Unity gameplay state machines while avoiding scene setup until wiring needs proof.
+
+```csharp
+using System;
+using NUnit.Framework;
+
+public interface ITransitionRule
+{
+    Type NextState { get; }
+    bool ShouldTransition();
+}
+
+public sealed class JumpTransitionTests
+{
+    [Test]
+    public void ShouldTransition_ReturnsTrue_WhenJumpIsPressedAndGrounded()
+    {
+        var rule = new JumpTransition(jumpPressed: true, isGrounded: true);
+
+        Assert.That(rule.ShouldTransition(), Is.True);
+        Assert.That(rule.NextState, Is.EqualTo(typeof(JumpState)));
+    }
+}
+
+public sealed class JumpTransition : ITransitionRule
+{
+    private readonly bool jumpPressed;
+    private readonly bool isGrounded;
+
+    public JumpTransition(bool jumpPressed, bool isGrounded)
+    {
+        this.jumpPressed = jumpPressed;
+        this.isGrounded = isGrounded;
+    }
+
+    public Type NextState => typeof(JumpState);
+    public bool ShouldTransition() => jumpPressed && isGrounded;
+}
+
+public sealed class JumpState { }
+```
 
 ## Why Order Matters
 

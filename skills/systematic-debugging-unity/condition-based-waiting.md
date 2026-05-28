@@ -39,7 +39,7 @@ yield return new WaitForSeconds(0.2f);
 Assert.IsTrue(playerMotor.IsGrounded);
 
 // GOOD: Waiting for the actual condition.
-yield return UnityConditionWait.Until(
+yield return UnityConditionWait.UntilFixed(
     () => playerMotor.IsGrounded,
     "player to become grounded after spawn");
 Assert.IsTrue(playerMotor.IsGrounded);
@@ -50,7 +50,7 @@ Assert.IsTrue(playerMotor.IsGrounded);
 | Scenario | Pattern |
 |----------|---------|
 | Wait for scene object | `yield return UnityConditionWait.UntilObjectExists("Player")` |
-| Wait for physics state | `yield return UnityConditionWait.Until(() => motor.IsGrounded, "player grounded")` |
+| Wait for physics state | `yield return UnityConditionWait.UntilFixed(() => motor.IsGrounded, "player grounded")` |
 | Wait for animation | `yield return UnityConditionWait.UntilAnimatorState(animator, "JumpLand")` |
 | Wait for component state | `yield return UnityConditionWait.Until(() => health.Current <= 0, "enemy death")` |
 | Wait for async operation | `yield return UnityConditionWait.Until(() => operation.isDone, "asset load")` |
@@ -79,7 +79,31 @@ public static IEnumerator Until(
 }
 ```
 
-See `condition-based-waiting-example.cs` in this directory for Unity helpers.
+For physics conditions in PlayMode tests, yield fixed physics steps:
+
+```csharp
+public static IEnumerator UntilFixed(
+    Func<bool> condition,
+    string description,
+    float timeoutSeconds = 5f)
+{
+    var start = Time.realtimeSinceStartup;
+
+    while (!condition())
+    {
+        if (Time.realtimeSinceStartup - start > timeoutSeconds)
+        {
+            Assert.Fail($"Timeout waiting for {description}");
+        }
+
+        yield return new WaitForFixedUpdate();
+    }
+}
+```
+
+Use `GameObject.Find` helpers only for smoke tests. Prefer direct references, serialized references, or explicit scene queries when possible.
+
+See `condition-based-waiting-example.cs` in this directory for Unity helpers and a `[UnityTest]` example.
 
 ## Common Mistakes
 
@@ -94,6 +118,9 @@ See `condition-based-waiting-example.cs` in this directory for Unity helpers.
 
 **BAD: Editor/runtime mismatch:** EditMode proof is used for physics or animation behavior.
 **Fix:** Use PlayMode tests or a runtime smoke test when engine timing matters.
+
+**BAD: Name-only lookup:** `GameObject.Find("Player")` silently misses inactive objects and breaks when names change.
+**Fix:** Use direct references or serialized scene/prefab evidence unless the test is intentionally a broad smoke test.
 
 ## When Arbitrary Timeout IS Correct
 

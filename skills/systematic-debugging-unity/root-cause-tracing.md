@@ -75,7 +75,7 @@ Combat prefab variant was not inspected after the serialized field move.
 
 ## Adding Unity Evidence
 
-When manual tracing stalls, add temporary instrumentation near the failing operation:
+When manual tracing stalls, add temporary instrumentation near the failing operation. This is evidence-gathering code, not the fix. Remove it after tracing; do not commit broad guards that silently hide the failure.
 
 ```csharp
 private void PerformAttack()
@@ -92,11 +92,16 @@ private void PerformAttack()
         $"weaponConfig={(weaponConfig == null ? "null" : weaponConfig.name)}",
         this);
 
+    if (weaponConfig == null)
+    {
+        throw new System.InvalidOperationException("Missing WeaponConfig; trace prefab, variant, scene, and installer wiring.");
+    }
+
     damageCalculator.Calculate(weaponConfig.BaseDamage, target.Armor);
 }
 ```
 
-For runtime-only code, use `Debug.LogError(..., this)` so the console links back to the object.
+For runtime-only code, use `Debug.LogError(..., this)` so the console links back to the object. `UnityEditor.PrefabUtility` is Editor-only evidence; it is valid in Editor/PlayMode-in-Editor tracing, not in player builds.
 
 Run targeted tests:
 
