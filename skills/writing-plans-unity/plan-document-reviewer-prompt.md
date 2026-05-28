@@ -2,7 +2,7 @@
 
 Use this template when dispatching a plan document reviewer subagent.
 
-**Purpose:** Verify the plan is complete, matches the spec, and has proper task decomposition.
+**Purpose:** Verify the plan is complete, matches the spec, uses the expected prose language, and has proper task decomposition.
 
 **Dispatch after:** The complete plan is written.
 
@@ -14,6 +14,7 @@ Task tool (general-purpose):
 
     **Plan to review:** [PLAN_FILE_PATH]
     **Spec for reference:** [SPEC_FILE_PATH]
+    **User conversation language:** [LANGUAGE]
 
     ## What to Check
 
@@ -23,6 +24,7 @@ Task tool (general-purpose):
     | Spec Alignment | Plan covers spec requirements, no major scope creep |
     | Task Decomposition | Tasks have clear boundaries, steps are actionable |
     | Buildability | Could an engineer follow this plan without getting stuck? |
+    | Language | Explanatory body text uses the user's conversation language |
 
     ## Calibration
 
@@ -30,8 +32,15 @@ Task tool (general-purpose):
     An implementer building the wrong thing or getting stuck is an issue.
     Minor wording, stylistic preferences, and "nice to have" suggestions are not.
 
-    Approve unless there are serious gaps — missing requirements from the spec,
-    contradictory steps, placeholder content, or tasks so vague they can't be acted on.
+    Approve unless there are serious gaps, missing requirements from the spec,
+    contradictory steps, placeholder content, tasks so vague they can't be acted on,
+    or body prose written in the wrong language.
+
+    English template labels such as "Goal", "Task", "Step", "Expected",
+    "Issues Found", and "Recommendations" are allowed. They are not language
+    issues by themselves. The prose after those labels should use the user's
+    conversation language unless it is an exact technical identifier, command,
+    code symbol, file path, API name, package name, URL, or quoted source text.
 
     ## Output Format
 

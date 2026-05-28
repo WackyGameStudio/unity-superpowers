@@ -18,6 +18,22 @@ Assume the implementer is a skilled developer, but does not know this Unity proj
 **Save plans to:** `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
 - User preferences for plan location override this default.
 
+## Output Language Rules
+
+Human-readable explanatory prose, requirement descriptions, task detail paragraphs, review notes, questions, and handoff text in generated `docs/` artifacts MUST use the user's conversation language unless the user explicitly asks for another language.
+
+Template labels and structural labels may stay in English. Labels such as `Goal`, `Architecture`, `Verification`, `Task`, `Step`, `Expected`, `Recommendations`, and `Issues Found` are allowed. The content after those labels must be in the user's language.
+
+If the user writes in Korean, write the plan's explanations, task details, assumptions, verification rationale, reviewer notes, and handoff prose in natural Korean.
+
+Keep exact technical identifiers unchanged:
+
+- file paths, class names, method names, namespaces, package names, shader names, scene/prefab/asset names
+- Unity API names such as `MonoBehaviour`, `ScriptableObject`, `Rigidbody`, `Animator`, `MCPForUnity`, `EditMode`, and `PlayMode`
+- commands, code blocks, branch names, commit message examples, URLs, and quoted source text
+
+When using subagents, include the required prose language in every subagent prompt. Plan reviewers must check that body content follows the user's language while preserving technical identifiers and allowing template labels.
+
 ## Unity Plan Surface Requirements
 
 Before defining tasks, map every relevant Unity implementation surface. Plans MUST name each applicable item with exact paths, GameObject/component names, and expected evidence:
@@ -92,6 +108,8 @@ Every plan MUST start with this header:
 
 ---
 ```
+
+The header above is a structure example. English field labels may be used as-is. The explanatory content inside each field should use the user's language.
 
 ## Unity Task Structure
 
@@ -185,6 +203,8 @@ git commit -m "[type]: [short Unity task result]"
 ```
 ````
 
+The task template above is also structural. English labels and checklist titles may be used as-is. The body content under each label should use the user's language while preserving exact Unity identifiers and paths.
+
 When automated tests are feasible, the task MUST include red, green, and refactor steps. When automation is infeasible, the task MUST say why and replace RED/GREEN with precise Unity evidence such as MCPForUnity inspection, console output, scene smoke, prefab smoke, or manual observation.
 
 ## Plan Rejection Rules
@@ -235,6 +255,8 @@ After writing the complete plan, review it against the approved design or requir
 **5. Evidence consistency:** Does each task define the expected compile/domain reload, console, EditMode, PlayMode, scene smoke, prefab smoke, MCPForUnity, or manual evidence? Manual evidence must include the reason automation is infeasible.
 
 **6. Placeholder scan:** Search your plan for the red flags from "No Placeholders" and "Plan Rejection Rules." Fix every hit.
+
+**7. Language compliance:** Confirm that all explanatory body content in the saved plan uses the user's conversation language. English template labels are allowed. For Korean users, the prose after labels, task descriptions, assumptions, verification rationale, and handoff text must be Korean, while code identifiers and exact technical strings remain unchanged.
 
 If you find issues, fix them inline. If a design requirement has no task, add the task before handoff.
 
