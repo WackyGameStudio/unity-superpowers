@@ -49,6 +49,18 @@ For non-trivial Unity work:
 - File checks alone are not runtime proof.
 - Scene, prefab, `.meta`, package, asmdef, ProjectSettings, and serialized-field changes are first-class implementation surfaces.
 
+## MCPForUnity Setup
+
+Install MCP for Unity in the Unity project first:
+
+1. In Unity, open `Window > Package Manager > + > Add package from git URL`.
+2. Paste `https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#main`.
+3. Open `Window > MCP for Unity > Configure All Detected Clients`.
+4. Restart/refresh the AI coding agent if the MCP tools do not appear.
+5. Before using Unity tools, verify the active MCPForUnity target and `Application.dataPath`.
+
+Links: [MCP for Unity GitHub](https://github.com/CoplayDev/unity-mcp), [install docs](https://coplaydev.github.io/unity-mcp), [OpenUPM package](https://openupm.com/packages/com.coplaydev.unity-mcp/).
+
 ## Install
 
 Ask an AI coding agent to read `HowToInstall_AI.md` and install this pack into the target project for the agent you use.
