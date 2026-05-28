@@ -466,13 +466,14 @@ Skills that enforce discipline (like TDD) need to resist rationalization. Agents
 
 Don't just state the rule - forbid specific workarounds:
 
-<Bad>
+**Bad:**
+
 ```markdown
 Write code before test? Delete it.
 ```
-</Bad>
 
-<Good>
+**Good:**
+
 ```markdown
 Write code before test? Delete it. Start over.
 
@@ -482,7 +483,6 @@ Write code before test? Delete it. Start over.
 - Don't look at it
 - Delete means delete
 ```
-</Good>
 
 ### Address "Spirit vs Letter" Arguments
 

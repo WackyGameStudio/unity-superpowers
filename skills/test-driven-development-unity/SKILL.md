@@ -91,7 +91,8 @@ digraph tdd_cycle {
 
 Write one minimal test showing what should happen.
 
-<Good>
+**Good:**
+
 ```csharp
 using NUnit.Framework;
 using UnityEngine;
@@ -109,10 +110,11 @@ public sealed class MovementMathTests
     }
 }
 ```
-Clear name, tests real behavior, one thing
-</Good>
 
-<Bad>
+Clear name, tests real behavior, one thing
+
+**Bad:**
+
 ```csharp
 [Test]
 public void Movement_Works()
@@ -122,8 +124,8 @@ public void Movement_Works()
     Assert.That(velocity, Is.Not.EqualTo(Vector3.zero));
 }
 ```
+
 Vague name, only proves test setup
-</Bad>
 
 **Requirements:**
 - One behavior
@@ -151,7 +153,8 @@ Confirm:
 
 Write simplest code to pass the test.
 
-<Good>
+**Good:**
+
 ```csharp
 using UnityEngine;
 
@@ -163,10 +166,11 @@ public static class MovementMath
     }
 }
 ```
-Just enough to pass
-</Good>
 
-<Bad>
+Just enough to pass
+
+**Bad:**
+
 ```csharp
 using UnityEngine;
 
@@ -180,8 +184,8 @@ public sealed class AdvancedMovementPipeline : MonoBehaviour
     // YAGNI for a velocity clamp test.
 }
 ```
+
 Over-engineered
-</Bad>
 
 Don't add features, refactor other code, or "improve" beyond the test.
 
