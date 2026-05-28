@@ -13,7 +13,7 @@ Assume the implementer is a skilled developer, but does not know this Unity proj
 
 **Announce at start:** "I'm using the writing-plans-unity skill to create the implementation plan."
 
-**Context:** If working in an isolated worktree, it should have been created via the `superpowers:using-git-worktrees-unity` skill at execution time.
+**Context:** If working in an isolated worktree, it should have been created via the `using-git-worktrees-unity` skill at execution time.
 
 **Save plans to:** `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
 - User preferences for plan location override this default.
@@ -78,7 +78,7 @@ Every plan MUST start with this header:
 ```markdown
 # [Unity Feature Name] Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development-unity (recommended) or superpowers:executing-plans-unity to implement this Unity plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use subagent-driven-development-unity (recommended) or executing-plans-unity to implement this Unity plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** [One sentence describing the Unity feature or project setup result]
 
@@ -251,9 +251,9 @@ After saving the plan, offer execution choice:
 **Which approach?"**
 
 **If Subagent-Driven chosen:**
-- **REQUIRED SUB-SKILL:** Use superpowers:subagent-driven-development-unity
+- **REQUIRED SUB-SKILL:** Use subagent-driven-development-unity
 - Fresh subagent per task + two-stage review
 
 **If Inline Execution chosen:**
-- **REQUIRED SUB-SKILL:** Use superpowers:executing-plans-unity
+- **REQUIRED SUB-SKILL:** Use executing-plans-unity
 - Batch execution with checkpoints for review
