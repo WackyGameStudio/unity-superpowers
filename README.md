@@ -47,6 +47,35 @@ For non-trivial Unity work:
 6. Verify with `verification-before-completion-unity`.
 7. Capture reusable lessons with `compound-unity`.
 
+## Development Philosophy
+
+Unity Superpowers keeps the original Superpowers discipline: understand before building, test behavior before implementation when feasible, find root cause before fixing, isolate work, review early, verify before claiming completion, and preserve reusable lessons.
+
+The Unity adaptation adds one rule: Unity project state is more than code. Scenes, prefabs, `.meta` files, `ScriptableObject` assets, package manifests, asmdefs, ProjectSettings, serialized fields, layers, Animator parameters, physics settings, and active Editor targets are implementation surfaces. A Unity agent must reason about these surfaces explicitly instead of treating them as afterthoughts.
+
+Architecture guidance is also Unity-specific. Prefer small `MonoBehaviour` responsibilities, GameObject composition, narrow capability interfaces, `State` and transition rules for mode-specific behavior, `Strategy` for variable policy/calculation, and `ScriptableObject` assets for designer-tunable data. Runtime or Editor-backed claims require fresh Unity evidence through MCPForUnity, tests, console/import checks, scene smoke, prefab smoke, or clearly stated manual evidence.
+
+## Skill Guide
+
+| Skill | Unity-specific focus | How it extends Superpowers |
+| --- | --- | --- |
+| `using-superpowers-unity` | Routes each Unity request to the Unity-specific skill set and checks project readiness, project-local skills, `docs/solutions/`, and MCPForUnity target identity. | Keeps the "use the right skill first" discipline while preventing fallback to generic workflows for Unity scene, prefab, and Editor work. |
+| `unity-init` | Audits or creates Unity project structure, Git state, package state, MCPForUnity setup, active Editor target, import/compile/console evidence, and smoke-test readiness. | Turns Superpowers setup discipline into a Unity workspace readiness gate before design or implementation. |
+| `brainstorming-unity` | Asks Unity-native design questions: genre loop, input source, movement model, camera, scene/prefab boundaries, component ownership, animation, physics, UI, data assets, packages, and verification surface. | Keeps design-before-build, but makes the design include Unity architecture and Editor/runtime wiring rather than only code behavior. |
+| `writing-plans-unity` | Plans code, scene, prefab, asset, serialized-field, package/settings, asmdef, test, and MCPForUnity work with exact paths and expected evidence. | Keeps implementation plans executable for a fresh worker, with Unity surfaces and verification treated as first-class tasks. |
+| `using-git-worktrees-unity` | Requires isolated workspace setup before risky Unity changes, including `.unity`, `.prefab`, `.asset`, `.meta`, packages, and ProjectSettings edits. | Keeps work isolation while accounting for Unity-generated files and serialized asset merge risk. |
+| `subagent-driven-development-unity` | Splits work by Unity ownership boundaries: runtime scripts, editor tooling, asmdefs/packages, tests, scene integration, prefab integration, and data assets. | Keeps fresh subagent per task and two-stage review, but forbids parallel edits to shared Unity serialized state. |
+| `dispatching-parallel-agents-unity` | Allows parallel work only across independent Unity surfaces and makes shared scenes, prefabs, assets, manifests, `.meta`, and ProjectSettings sequential. | Keeps parallelism useful without trading speed for Unity serialization conflicts. |
+| `executing-plans-unity` | Executes approved plans with checkpoints for MCPForUnity target, Unity surfaces, compile/console, tests, scene smoke, and prefab smoke. | Keeps plan execution disciplined when subagents are unavailable or a separate execution flow is preferred. |
+| `test-driven-development-unity` | Applies TDD to Unity with pure C#, EditMode, PlayMode, condition-based waits, physics-aware waits, and copy-safe Unity C# examples. | Keeps red-green-refactor while respecting Unity test mode boundaries and runtime timing. |
+| `systematic-debugging-unity` | Traces Unity bugs through console logs, Editor state, package/import state, scene/prefab wiring, serialized references, physics timing, and MCPForUnity target mismatches. | Keeps root-cause-first debugging and adds Unity evidence paths before changing code or assets. |
+| `requesting-code-review-unity` | Reviews code and Unity artifacts together: `MonoBehaviour` boundaries, interfaces, state/strategy/data assets, serialized wiring, scene/prefab/asset changes, asmdefs, packages, and evidence. | Keeps early review while making Unity behavior risk part of the review surface. |
+| `receiving-code-review-unity` | Evaluates feedback technically before applying it and verifies Unity-specific claims with compile, console, tests, asset inspection, or runtime evidence. | Keeps review rigor and prevents unverified changes to Unity wiring or architecture. |
+| `verification-before-completion-unity` | Requires target identity, `Application.dataPath`, compile state, console state, EditMode/PlayMode tests, asset inspection, scene/prefab smoke, or explicit limitation reporting. | Keeps evidence-before-assertions and blocks runtime claims from file-only checks. |
+| `finishing-a-development-branch-unity` | Finalizes Unity work only after fresh verification and then guides merge, PR, preserve, discard, or cleanup choices. | Keeps branch completion explicit while protecting Unity assets and generated state. |
+| `compound-unity` | Captures solved Unity blockers and reusable lessons about MCPForUnity, Editor state, scene/prefab serialization, `.meta` GUIDs, package issues, test timing, and architecture decisions. | Keeps lessons reusable so future agents do not rediscover Unity-specific workarounds. |
+| `writing-skills-unity` | Creates or revises Unity process skills with pressure scenarios involving scene verification, prefab wiring, PlayMode timing, MCPForUnity, and oversized `MonoBehaviour` risks. | Keeps skill-writing as TDD for process documentation, with Unity-specific failure modes in the tests. |
+
 ## What unity-init Does
 
 `unity-init` prepares or repairs a Unity workspace before implementation work. It does not silently mutate the project. It explains the change and asks for approval before project creation, Git setup, package installation, MCPForUnity configuration, Codex config edits, remotes, or Git LFS setup.

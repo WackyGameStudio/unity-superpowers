@@ -47,6 +47,35 @@ unity-superpowers-0.0.1/
 6. `verification-before-completion-unity`로 완료 주장 전 검증합니다.
 7. 반복 가능한 Unity 교훈은 `compound-unity`로 남깁니다.
 
+## 개발 철학
+
+Unity Superpowers는 기존 Superpowers의 규율을 유지합니다. 만들기 전에 이해하고, 가능하면 구현 전에 동작을 테스트하며, 수정 전에 root cause를 찾고, 작업을 격리하고, 일찍 리뷰하며, 완료 주장 전에 검증하고, 반복 가능한 교훈을 남깁니다.
+
+Unity 버전에서 추가되는 핵심은 Unity 프로젝트 상태가 코드만이 아니라는 점입니다. Scene, prefab, `.meta` 파일, `ScriptableObject` asset, package manifest, asmdef, ProjectSettings, serialized field, layer, Animator parameter, physics setting, active Editor target은 모두 구현 표면입니다. Unity 에이전트는 이런 표면을 부수적인 정리 작업이 아니라 설계와 구현의 일부로 다뤄야 합니다.
+
+아키텍처도 Unity에 맞춰 압력을 줍니다. 작은 `MonoBehaviour` 책임, GameObject composition, 좁은 capability interface, mode-specific behavior를 위한 `State`와 transition rule, policy/calculation 변형을 위한 `Strategy`, designer-tunable data를 위한 `ScriptableObject` asset을 선호합니다. Runtime 또는 Editor 기반 완료 주장은 MCPForUnity, 테스트, console/import 확인, scene smoke, prefab smoke, 또는 명시적인 manual evidence 같은 fresh Unity evidence가 필요합니다.
+
+## 스킬 가이드
+
+| Skill | Unity-specific focus | Superpowers 철학과의 연결 |
+| --- | --- | --- |
+| `using-superpowers-unity` | Unity 요청을 Unity 전용 스킬셋으로 라우팅하고 project readiness, project-local skills, `docs/solutions/`, MCPForUnity target identity를 확인합니다. | "먼저 맞는 스킬을 사용한다"는 규율을 유지하되 Unity scene, prefab, Editor 작업에서 generic workflow로 후퇴하지 않게 합니다. |
+| `unity-init` | Unity project structure, Git state, package state, MCPForUnity setup, active Editor target, import/compile/console evidence, smoke-test readiness를 점검하거나 준비합니다. | Superpowers의 setup discipline을 Unity workspace readiness gate로 바꿉니다. |
+| `brainstorming-unity` | Genre loop, input source, movement model, camera, scene/prefab boundary, component ownership, animation, physics, UI, data asset, package, verification surface를 질문합니다. | design-before-build를 유지하되 설계가 코드 동작만이 아니라 Unity architecture와 Editor/runtime wiring까지 포함하게 합니다. |
+| `writing-plans-unity` | code, scene, prefab, asset, serialized field, package/settings, asmdef, test, MCPForUnity 작업을 exact path와 expected evidence로 계획합니다. | fresh worker가 실행 가능한 계획을 유지하면서 Unity surface와 verification을 first-class task로 둡니다. |
+| `using-git-worktrees-unity` | `.unity`, `.prefab`, `.asset`, `.meta`, packages, ProjectSettings 변경 전에 isolated workspace를 확인합니다. | work isolation 철학을 Unity generated file과 serialized asset merge risk에 맞춥니다. |
+| `subagent-driven-development-unity` | runtime scripts, editor tooling, asmdefs/packages, tests, scene integration, prefab integration, data assets 같은 Unity ownership boundary로 작업을 나눕니다. | fresh subagent per task와 two-stage review를 유지하되 공유 Unity serialized state의 병렬 수정을 금지합니다. |
+| `dispatching-parallel-agents-unity` | 독립된 Unity surface에서만 parallel work를 허용하고 shared scene, prefab, asset, manifest, `.meta`, ProjectSettings는 sequential하게 둡니다. | 속도를 유지하되 Unity serialization conflict로 인한 비용을 피합니다. |
+| `executing-plans-unity` | MCPForUnity target, Unity surface, compile/console, tests, scene smoke, prefab smoke checkpoint로 승인된 계획을 실행합니다. | subagent를 쓰지 않거나 별도 실행 흐름을 택할 때도 plan execution discipline을 유지합니다. |
+| `test-driven-development-unity` | pure C#, EditMode, PlayMode, condition-based wait, physics-aware wait, copy-safe Unity C# 예시로 TDD를 적용합니다. | red-green-refactor를 유지하면서 Unity test mode와 runtime timing을 반영합니다. |
+| `systematic-debugging-unity` | console log, Editor state, package/import state, scene/prefab wiring, serialized reference, physics timing, MCPForUnity target mismatch를 따라 Unity bug를 추적합니다. | root-cause-first debugging을 유지하고 코드나 asset 수정 전에 Unity evidence path를 요구합니다. |
+| `requesting-code-review-unity` | `MonoBehaviour` boundary, interface, state/strategy/data asset, serialized wiring, scene/prefab/asset changes, asmdefs, packages, evidence를 함께 리뷰합니다. | early review 철학을 유지하면서 Unity behavior risk를 review surface에 포함합니다. |
+| `receiving-code-review-unity` | 피드백을 기술적으로 평가한 뒤 compile, console, tests, asset inspection, runtime evidence로 Unity-specific claim을 검증합니다. | review rigor를 유지하고 검증 없는 Unity wiring/architecture 변경을 막습니다. |
+| `verification-before-completion-unity` | target identity, `Application.dataPath`, compile state, console state, EditMode/PlayMode tests, asset inspection, scene/prefab smoke, limitation reporting을 요구합니다. | evidence-before-assertions를 유지하고 file-only check로 runtime claim을 하지 못하게 합니다. |
+| `finishing-a-development-branch-unity` | fresh verification 이후 merge, PR, preserve, discard, cleanup 선택을 안내합니다. | branch completion을 명시적으로 유지하면서 Unity asset과 generated state를 보호합니다. |
+| `compound-unity` | MCPForUnity, Editor state, scene/prefab serialization, `.meta` GUID, package issue, test timing, architecture decision 같은 Unity blocker와 교훈을 저장합니다. | future agent가 Unity-specific workaround를 다시 발견하지 않도록 reusable lesson을 남깁니다. |
+| `writing-skills-unity` | scene verification, prefab wiring, PlayMode timing, MCPForUnity, oversized `MonoBehaviour` 위험을 포함한 pressure scenario로 Unity process skill을 작성/검증합니다. | skill-writing as TDD for process documentation을 유지하되 Unity-specific failure mode를 테스트에 넣습니다. |
+
 ## unity-init이 하는 일
 
 `unity-init`은 구현 작업 전에 Unity workspace를 준비하거나 복구합니다. 프로젝트를 조용히 바꾸지 않습니다. 프로젝트 생성, Git 설정, 패키지 설치, MCPForUnity 설정, Codex config 수정, remote 추가, Git LFS 설정 전에 변경 내용을 설명하고 승인을 받습니다.
