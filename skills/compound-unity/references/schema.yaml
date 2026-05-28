@@ -1,0 +1,285 @@
+# Documentation schema for Unity learnings written by compound-unity.
+# Treat this as the canonical frontmatter contract for docs/solutions/.
+#
+# problem_type preserves the original ce-compound bug/knowledge taxonomy.
+# Unity specificity belongs in component, tags, root_cause, resolution_type,
+# and evidence fields.
+
+tracks:
+  bug:
+    description: "Defects, failures, and errors that were diagnosed and fixed"
+    problem_types:
+      - build_error
+      - test_failure
+      - runtime_error
+      - performance_issue
+      - database_issue
+      - security_issue
+      - ui_bug
+      - integration_issue
+      - logic_error
+  knowledge:
+    description: "Practices, patterns, conventions, decisions, workflow improvements, and documentation"
+    problem_types:
+      - developer_experience
+      - workflow_issue
+      - best_practice
+      - documentation_gap
+      - architecture_pattern
+      - design_pattern
+      - tooling_decision
+      - convention
+
+required_fields:
+  title:
+    type: string
+    description: "Clear title for the documented Unity learning"
+
+  date:
+    type: string
+    pattern: '^\d{4}-\d{2}-\d{2}$'
+    description: "Date documented (YYYY-MM-DD)"
+
+  category:
+    type: string
+    description: "docs/solutions subdirectory selected from the problem_type mapping"
+
+  module:
+    type: string
+    description: "Unity project area, package, scene, prefab, subsystem, or workflow affected"
+
+  problem_type:
+    type: enum
+    values:
+      - build_error
+      - test_failure
+      - runtime_error
+      - performance_issue
+      - database_issue
+      - security_issue
+      - ui_bug
+      - integration_issue
+      - logic_error
+      - developer_experience
+      - workflow_issue
+      - best_practice
+      - documentation_gap
+      - architecture_pattern
+      - design_pattern
+      - tooling_decision
+      - convention
+    description: "Primary category and track. Use preserved ce-compound values; put Unity-specific details in component and tags."
+
+  component:
+    type: enum
+    values:
+      - unity_mcp
+      - codex_config
+      - editor_workflow
+      - scene
+      - prefab
+      - script
+      - asmdef
+      - package
+      - project_settings
+      - input_system
+      - physics
+      - animation
+      - ui
+      - rendering
+      - tests_editmode
+      - tests_playmode
+      - scriptable_object
+      - asset_pipeline
+      - documentation
+      - development_workflow
+      - unity_editor
+      - navmesh
+      - vehicle
+      - interaction_system
+      - damage_system
+      - state_machine
+      - verification
+      - tooling
+    description: "Primary Unity component or workflow surface involved"
+
+  severity:
+    type: enum
+    values:
+      - critical
+      - high
+      - medium
+      - low
+    description: "Impact severity"
+
+track_rules:
+  bug:
+    required:
+      symptoms:
+        type: array[string]
+        min_items: 1
+        max_items: 6
+        description: "Observable symptoms such as console errors, failed tests, broken scene/prefab behavior, or runtime issues"
+      root_cause:
+        type: enum
+        values:
+          - active_target_drift
+          - stale_mcp_tools
+          - incomplete_editor_setup
+          - compile_error
+          - domain_reload_timing
+          - console_error
+          - missing_serialized_reference
+          - prefab_override_conflict
+          - scene_dirty_state
+          - guid_mismatch
+          - missing_meta_file
+          - asmdef_reference_missing
+          - package_dependency_missing
+          - manifest_mismatch
+          - editor_runtime_boundary
+          - fixed_update_timing
+          - animation_event_mismatch
+          - animator_parameter_mismatch
+          - input_action_miswired
+          - asset_load_path_wrong
+          - scriptable_object_reference_missing
+          - missing_scene_wiring
+          - insufficient_verification
+          - architecture_coupling
+          - missing_workflow_step
+          - inadequate_documentation
+          - missing_tooling
+          - incomplete_setup
+          - wrong_api
+          - logic_error
+        description: "Fundamental cause of the problem. Values may be Unity-specific while problem_type stays generic."
+      resolution_type:
+        type: enum
+        values:
+          - unity_mcp_retarget
+          - editor_setup_change
+          - code_fix
+          - scene_wiring_change
+          - prefab_wiring_change
+          - serialization_fix
+          - meta_guid_restore
+          - asmdef_reference_change
+          - package_manifest_change
+          - config_change
+          - test_fix
+          - playmode_fix
+          - editmode_fix
+          - dependency_update
+          - environment_setup
+          - workflow_improvement
+          - documentation_update
+          - tooling_addition
+          - architecture_refactor
+          - verification_update
+          - workaround
+        description: "Type of fix, workaround, or evidence update applied"
+
+  knowledge:
+    optional:
+      applies_when:
+        type: array[string]
+        max_items: 6
+        description: "Conditions or situations where this guidance applies"
+      symptoms:
+        type: array[string]
+        max_items: 6
+        description: "Observable gaps or friction that prompted this guidance"
+      root_cause:
+        type: enum
+        values:
+          - active_target_drift
+          - stale_mcp_tools
+          - incomplete_editor_setup
+          - compile_error
+          - domain_reload_timing
+          - console_error
+          - missing_serialized_reference
+          - prefab_override_conflict
+          - scene_dirty_state
+          - guid_mismatch
+          - missing_meta_file
+          - asmdef_reference_missing
+          - package_dependency_missing
+          - manifest_mismatch
+          - editor_runtime_boundary
+          - fixed_update_timing
+          - animation_event_mismatch
+          - animator_parameter_mismatch
+          - input_action_miswired
+          - asset_load_path_wrong
+          - scriptable_object_reference_missing
+          - missing_scene_wiring
+          - insufficient_verification
+          - architecture_coupling
+          - missing_workflow_step
+          - inadequate_documentation
+          - missing_tooling
+          - incomplete_setup
+          - wrong_api
+          - logic_error
+        description: "Underlying cause, if there is a specific one"
+      resolution_type:
+        type: enum
+        values:
+          - unity_mcp_retarget
+          - editor_setup_change
+          - code_fix
+          - scene_wiring_change
+          - prefab_wiring_change
+          - serialization_fix
+          - meta_guid_restore
+          - asmdef_reference_change
+          - package_manifest_change
+          - config_change
+          - test_fix
+          - playmode_fix
+          - editmode_fix
+          - dependency_update
+          - environment_setup
+          - workflow_improvement
+          - documentation_update
+          - tooling_addition
+          - architecture_refactor
+          - verification_update
+          - workaround
+        description: "Type of change, if applicable"
+
+optional_fields:
+  related_components:
+    type: array[string]
+    description: "Other Unity components, scenes, prefabs, assets, packages, or workflows involved"
+
+  tags:
+    type: array[string]
+    max_items: 10
+    description: "Search keywords, lowercase and hyphen-separated where possible"
+
+  unity_version:
+    type: string
+    description: "Unity Editor version when relevant"
+
+  mcp_tool:
+    type: string
+    description: "MCPForUnity tool or tool group involved, when relevant"
+
+  evidence:
+    type: array[string]
+    max_items: 8
+    description: "Short list of verification evidence commands, tests, console checks, or smoke checks"
+
+validation_rules:
+  - "Determine track from problem_type using the tracks section above"
+  - "All shared required_fields must be present"
+  - "Bug-track docs must include symptoms, root_cause, and resolution_type"
+  - "Knowledge-track docs have no additional required fields beyond the shared required_fields"
+  - "Enum fields must match allowed values exactly"
+  - "Array fields must respect min_items and max_items when specified"
+  - "date must match YYYY-MM-DD format"
+  - "tags should be lowercase and hyphen-separated where possible"
+  - "Array-of-strings frontmatter items must be wrapped in double quotes when the value starts with a YAML reserved indicator or contains ': '"
