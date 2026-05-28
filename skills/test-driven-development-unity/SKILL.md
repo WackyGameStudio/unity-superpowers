@@ -233,6 +233,21 @@ Next failing test for next feature.
 
 Use EditMode tests for designer-tunable data assets and default values.
 
+`AgentStats.cs`
+
+```csharp
+using UnityEngine;
+
+[CreateAssetMenu(menuName = "Game/Agent Stats")]
+public sealed class AgentStats : ScriptableObject
+{
+    [SerializeField] private float maxSpeed = 4f;
+    public float MaxSpeed => maxSpeed;
+}
+```
+
+`AgentStatsTests.cs`
+
 ```csharp
 using NUnit.Framework;
 using UnityEngine;
@@ -253,13 +268,6 @@ public sealed class AgentStatsTests
             UnityEngine.Object.DestroyImmediate(stats);
         }
     }
-}
-
-[CreateAssetMenu(menuName = "Game/Agent Stats")]
-public sealed class AgentStats : ScriptableObject
-{
-    [SerializeField] private float maxSpeed = 4f;
-    public float MaxSpeed => maxSpeed;
 }
 ```
 

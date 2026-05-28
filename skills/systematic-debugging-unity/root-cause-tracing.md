@@ -78,6 +78,7 @@ Combat prefab variant was not inspected after the serialized field move.
 When manual tracing stalls, add temporary instrumentation near the failing operation. This is evidence-gathering code, not the fix. Remove it after tracing; do not commit broad guards that silently hide the failure.
 
 ```csharp
+// Temporary tracing only. Remove after diagnosis.
 private void PerformAttack()
 {
 #if UNITY_EDITOR

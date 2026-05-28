@@ -57,7 +57,7 @@ Assert.IsTrue(playerMotor.IsGrounded);
 
 ## Implementation
 
-Generic UnityTest polling function:
+Generic UnityTest polling function excerpt:
 
 ```csharp
 public static IEnumerator Until(

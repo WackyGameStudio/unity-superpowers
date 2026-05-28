@@ -6,7 +6,7 @@ using UnityEngine.TestTools;
 
 /// <summary>
 /// Condition-based waiting helpers for UnityTest coroutines.
-/// Copy into a test assembly when a test waits for scene, physics,
+/// Copy into a PlayMode test assembly when a test waits for scene, physics,
 /// animation, async loading, or generated object state.
 /// </summary>
 public static class UnityConditionWait
