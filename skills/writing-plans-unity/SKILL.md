@@ -1,6 +1,6 @@
 ---
 name: writing-plans-unity
-description: Use when an approved Unity design or requirements need an implementation plan before touching code, scenes, prefabs, assets, packages, tests, or MCPForUnity tools
+description: Use when an approved Unity design or requirements need an implementation plan, or when reviewing an existing Unity spec/plan before execution, before touching code, scenes, prefabs, assets, packages, tests, or MCPForUnity tools
 ---
 
 # Writing Unity Implementation Plans
@@ -259,6 +259,40 @@ After writing the complete plan, review it against the approved design or requir
 **7. Language compliance:** Confirm that all explanatory body content in the saved plan uses the user's conversation language. English template labels are allowed. For Korean users, the prose after labels, task descriptions, assumptions, verification rationale, and handoff text must be Korean, while code identifiers and exact technical strings remain unchanged.
 
 If you find issues, fix them inline. If a design requirement has no task, add the task before handoff.
+
+## Existing Plan Review Handoff
+
+Use this section when the user asks to inspect, analyze, review, or continue from an existing spec and implementation plan before deciding the next step.
+
+After reviewing the existing spec/plan, do not end with an open-ended "should I proceed?" question. Classify the plan and present the next-step choices explicitly.
+
+**If the plan is execution-ready:**
+
+**"`docs/superpowers/plans/<filename>.md` is execution-ready. Two execution options:**
+
+**1. Worktree + Subagent-Driven (recommended)** - I use `using-git-worktrees-unity` to set up or verify an isolated workspace, then dispatch a fresh subagent per task with review between tasks
+
+**2. Worktree + Inline Execution** - I use `using-git-worktrees-unity` to set up or verify an isolated workspace, then execute tasks in this session using `executing-plans-unity` with checkpoints
+
+**Which approach?"**
+
+**If the plan is not execution-ready:**
+
+Summarize the blockers, then offer concrete choices:
+
+**"`docs/superpowers/plans/<filename>.md` needs correction before safe execution. Options:**
+
+**1. Fix the implementation plan first** - I update the plan so missing Unity surfaces, serialized wiring, tests, and verification evidence are explicit, then return to the execution handoff
+
+**2. Prepare baseline isolation first** - I use `using-git-worktrees-unity` or ask for explicit in-place approval after Git-tracked Unity baseline files are handled, then return to plan correction or execution
+
+**3. Stop here** - I leave the analysis as-is
+
+**Which approach?"**
+
+Use the user's conversation language for the actual question. Keep skill names and plan paths unchanged.
+
+If the user chooses plan correction, revise the plan and then run the normal `Execution Handoff` below. If the user chooses baseline isolation, use `using-git-worktrees-unity` first, then return to this decision point.
 
 ## Execution Handoff
 

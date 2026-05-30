@@ -146,6 +146,7 @@ Examples:
 - "Let's build X" -> `brainstorming-unity`, then `writing-plans-unity`.
 - "Fix this bug" -> `systematic-debugging-unity`, then `test-driven-development-unity` if code changes are needed.
 - "Set up this Unity project" -> `unity-init`.
+- "Review the existing spec/implementation plan and decide next step" -> `writing-plans-unity` existing plan review handoff.
 - "Implement this approved plan" -> `subagent-driven-development-unity` when subagents are available, otherwise `executing-plans-unity`.
 - "Is this done?" -> `verification-before-completion-unity`.
 
@@ -153,6 +154,7 @@ Handoff expectations:
 
 - After `brainstorming-unity` writes the spec, ask whether to proceed to `writing-plans-unity`.
 - After `writing-plans-unity` writes the plan, ask whether to run `using-git-worktrees-unity` and then execute with `subagent-driven-development-unity` or `executing-plans-unity`.
+- After reviewing an existing implementation plan, do not stop at analysis. If execution-ready, offer `Worktree + Subagent-Driven` and `Worktree + Inline Execution`. If not execution-ready, offer plan correction, baseline isolation, or stop.
 - Before any plan execution, `using-git-worktrees-unity` must set up or verify isolation, unless the user explicitly approves working in place.
 
 ## Skill Types
