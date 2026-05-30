@@ -264,9 +264,18 @@ optional_fields:
     type: string
     description: "Unity Editor version when relevant"
 
+  editor_bridge:
+    type: enum
+    values:
+      - unity_ai_assistant
+      - mcpforunity
+      - file_only
+      - unknown
+    description: "Unity Editor bridge mode involved in the issue or verification."
+
   mcp_tool:
     type: string
-    description: "MCPForUnity tool or tool group involved, when relevant"
+    description: "Specific MCPForUnity tool or tool group, or Official MCP tool, when relevant"
 
   evidence:
     type: array[string]
@@ -282,4 +291,6 @@ validation_rules:
   - "Array fields must respect min_items and max_items when specified"
   - "date must match YYYY-MM-DD format"
   - "tags should be lowercase and hyphen-separated where possible"
-  - "Array-of-strings frontmatter items must be wrapped in double quotes when the value starts with a YAML reserved indicator or contains ': '"
+  - "editor_bridge records bridge mode; mcp_tool records a specific MCPForUnity tool or tool group, or Official MCP tool when relevant"
+  - "Array-of-strings frontmatter items must be wrapped in double quotes when the value starts with a YAML reserved indicator or contains ': ' or ' #'"
+  - "Scalar string frontmatter values must be wrapped in double quotes when the value starts with a YAML reserved indicator or contains ': ' or ' #'"

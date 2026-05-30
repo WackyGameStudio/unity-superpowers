@@ -55,8 +55,16 @@ Optional:
 - `related_components`: Other Unity components, scenes, prefabs, assets, packages, or workflows involved.
 - `tags`: Search keywords, lowercase and hyphen-separated where possible.
 - `unity_version`: Unity Editor version when relevant.
-- `mcp_tool`: MCPForUnity tool or tool group involved, when relevant.
+- `editor_bridge`: Unity Editor bridge mode involved in the issue or verification. Use one of `unity_ai_assistant`, `mcpforunity`, `file_only`, or `unknown`.
+- `mcp_tool`: Specific MCPForUnity tool or tool group, or Official MCP tool, when relevant. `editor_bridge` records the mode; `mcp_tool` records the specific tool when relevant.
 - `evidence`: Short list of verification evidence commands, tests, console checks, or smoke checks.
+
+Example bridge metadata:
+
+```yaml
+editor_bridge: mcpforunity
+mcp_tool: read_console
+```
 
 ## Category Mapping
 
@@ -91,11 +99,11 @@ Optional:
 
 ## YAML Safety Rules
 
-Strict YAML 1.2 parsers reject array items that start with a reserved indicator character as unquoted scalars. When writing items for any array-of-strings field (`symptoms`, `applies_when`, `tags`, `related_components`, `evidence`, or any future array field), wrap the value in double quotes if it starts with any of:
+Strict YAML 1.2 parsers can reject or silently reinterpret array items that start with a reserved indicator character as unquoted scalars. When writing items for any array-of-strings field (`symptoms`, `applies_when`, `tags`, `related_components`, `evidence`, or any future array field), wrap the value in double quotes if it starts with any of:
 
-`` ` ``, `[`, `*`, `&`, `!`, `|`, `>`, `%`, `@`, `?`
+`-`, `?`, `:`, `,`, `[`, `]`, `{`, `}`, `#`, `&`, `*`, `!`, `|`, `>`, `'`, `"`, `%`, `@`, or `` ` ``
 
-Also quote if the value contains the substring `": "`. That punctuation can confuse flow-style parsers.
+Also quote if the value contains the substring `: ` or ` #`. That punctuation can confuse parsers or truncate the value.
 
 Example before, which can break strict YAML:
 
@@ -109,6 +117,7 @@ Example after, which parses cleanly:
 ```yaml
 symptoms:
   - "`Application.dataPath` points at the wrong active project"
+editor_bridge: mcpforunity
 ```
 
-Scalar string fields such as `title:` also need quotes when they contain ` #` or `: `. The validator catches those silent-corruption risks.
+Scalar string fields such as `title:` also need quotes when they start with a reserved indicator or contain ` #` or `: `. The validator catches those parser-safety risks.

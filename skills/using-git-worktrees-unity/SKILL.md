@@ -13,7 +13,7 @@ Ensure work happens in an isolated workspace. Prefer your platform's native work
 
 Unity worktrees can duplicate large `Library/` folders if opened carelessly. Do not copy `Library/`, `Temp/`, `Obj/`, or generated IDE files. After creating or switching worktrees, verify Unity project identity and let Unity regenerate Library state.
 
-When a project uses MCPForUnity, confirm the active Editor instance targets the worktree path before changing scenes, prefabs, assets, or tests.
+When a project uses an Editor bridge, confirm the active bridge target identity points at the worktree path before changing scenes, prefabs, assets, or tests.
 
 **Core principle:** Detect existing isolation first. Then use native tools. Then fall back to git. Never fight the harness.
 
@@ -141,10 +141,10 @@ if [ -f go.mod ]; then go mod download; fi
 Run the strongest available baseline evidence before implementation:
 
 ```text
-MCPForUnity target identity -> Application.dataPath -> refresh_unity -> read_console -> EditMode tests -> PlayMode tests where relevant
+Editor bridge mode -> active Editor bridge target identity -> Application.dataPath through the active bridge when available -> refresh/import evidence -> console evidence -> EditMode tests -> PlayMode tests where relevant
 ```
 
-If MCPForUnity is unavailable, run valid project fallback checks and report that Editor/runtime proof is unavailable. Do not claim Unity runtime or Editor verification from file-state checks alone.
+If no Editor bridge is available, run valid project fallback checks and report that Editor/runtime proof is unavailable. Do not claim Unity runtime or Editor verification from file-state checks alone.
 
 **If baseline verification fails:** Report failures, ask whether to proceed, investigate, or fix setup first.
 
@@ -154,7 +154,7 @@ If MCPForUnity is unavailable, run valid project fallback checks and report that
 
 ```
 Worktree ready at <full-path>
-Baseline evidence: <target identity | console | tests | limitations>
+Baseline evidence: <bridge mode | active Editor bridge target identity | console | tests | limitations>
 Ready to implement <feature-name>
 ```
 

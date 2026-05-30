@@ -17,7 +17,7 @@ Guide completion of Unity development work by verifying evidence, presenting cle
 
 Before presenting finish options, check:
 
-- MCPForUnity target identity and `Application.dataPath` when Editor work was involved
+- active Editor bridge target identity, plus `Application.dataPath` through the active bridge when available, when Editor work was involved
 - compile/domain reload state
 - Unity console errors and warnings after the final refresh
 - relevant EditMode tests
@@ -37,13 +37,13 @@ Do not claim Unity Editor or runtime verification from file-state checks alone.
 
 Before presenting options, verify the strongest relevant Unity evidence available.
 
-Use the project's actual commands or MCPForUnity tools. Typical evidence chain:
+Use the project's actual commands or active bridge tools or evidence. Typical evidence chain:
 
 ```text
-MCPForUnity target identity -> Application.dataPath -> refresh_unity -> read_console -> EditMode tests -> PlayMode tests -> scene/prefab smoke
+Editor bridge mode -> active Editor bridge target identity -> Application.dataPath through the active bridge when available -> refresh/import evidence -> console evidence -> EditMode tests -> PlayMode tests -> scene/prefab smoke
 ```
 
-If MCPForUnity is unavailable, report the limitation and use only valid fallback evidence. Do not claim Editor/runtime proof.
+If no Editor bridge is available, report the limitation and use only valid fallback evidence. Do not claim Editor/runtime proof.
 
 **If verification fails:**
 
@@ -130,7 +130,7 @@ git merge <feature-branch>
 Verify Unity evidence again on the merged result before cleanup:
 
 ```text
-<Unity verification commands or MCPForUnity checks>
+<Unity verification commands or active bridge checks>
 ```
 
 Only after merge and verification succeed, run Step 6 and delete the branch:

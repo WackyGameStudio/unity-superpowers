@@ -1,13 +1,13 @@
 ---
 name: unity-init
-description: Use when starting or repairing a Unity project workspace for Codex, especially when Unity project markers, Git, MCPForUnity, Codex config, or Editor verification may be missing
+description: Use when starting or repairing a Unity project workspace, especially when Unity project markers, Git, Unity Editor Bridge, Codex/MCP config, Unity AI Assistant setup, MCPForUnity setup, or Editor verification may be missing
 ---
 
 # Unity Init
 
 ## Overview
 
-Prepare a folder so Codex can work as a Unity project operator with correct project identity, Git state, MCPForUnity access, tool groups, compile/console evidence, and smoke-test readiness.
+Prepare a folder so Codex can work as a Unity project operator with correct project identity, Git state, active Editor bridge mode, bridge evidence, compile/console evidence, and smoke-test readiness.
 
 Ask questions and write user-facing guidance in the user's language. Preserve identifiers, paths, commands, Unity API names, package URLs, config paths, frontmatter values, and quoted source text exactly.
 
@@ -28,22 +28,24 @@ Check in this order and report what each check proves.
    - installed Unity Editors
    - known editor executable paths such as `%ProgramFiles%\Unity\Hub\Editor\<version>\Editor\Unity.exe`
    - any existing `ProjectSettings/ProjectVersion.txt` that names a target Unity version
-4. MCPForUnity:
+4. Unity Editor Bridge:
+   - selected bridge mode: `Unity AI Assistant / Official MCP`, `External coding agent + MCPForUnity`, or `file-only fallback`
    - `Packages/manifest.json`
-   - Codex MCP config
-   - MCPForUnity package visibility
-   - MCPForUnity tool visibility
+   - Unity AI Assistant package and Official MCP connection when using Unity AI Assistant
+   - MCPForUnity package visibility and Codex config when using MCPForUnity
+   - bridge tool or connection visibility
 5. Target identity:
-   - MCPForUnity active project
-   - `Application.dataPath` queried through MCPForUnity
+   - active Editor bridge project when a bridge is available
+   - `Application.dataPath` queried through the active bridge when available
+   - file-only limitation when no bridge is available
 
-If MCPForUnity is missing, stale, or aimed at the wrong project, use only file checks and report that Editor-backed control and runtime verification are unavailable.
+If the Unity Editor Bridge is missing, stale, unavailable, or aimed at the wrong project, use only fallback evidence and report that Editor-backed control and runtime verification are unavailable.
 
 ## No Project Flow
 
 If the folder does not contain Unity project markers, ask whether the user wants automatic project creation or manual Unity Hub creation.
 
-If the user chooses manual creation, stop. Tell the user to create the Unity project in this folder and say when ready. Do not continue into Git setup, MCPForUnity setup, or Codex config changes until the project exists or the user explicitly redirects.
+If the user chooses manual creation, stop. Tell the user to create the Unity project in this folder and say when ready. Do not continue into Git setup, Unity Editor Bridge setup, or Codex/MCP config changes until the project exists or the user explicitly redirects.
 
 If automatic creation is feasible, ask only for missing decisions:
 
@@ -159,7 +161,55 @@ Create or merge a Unity `.gitignore` only after checking whether one already exi
 
 Offer Git LFS for large binary/art-heavy projects, especially projects with large textures, audio, video, models, or frequent art asset churn. Do not install, initialize, or configure Git LFS without approval.
 
-## MCPForUnity Setup
+## Unity Editor Bridge Selection
+
+Before Unity Editor Bridge setup, ask:
+
+```text
+Unity Editor integration을 어떤 방식으로 사용할까요?
+```
+
+Offer these choices:
+
+- `Unity AI Assistant / Official MCP`
+- `External coding agent + MCPForUnity`
+- `file-only fallback`
+
+Recommend `Unity AI Assistant / Official MCP` for the official in-Editor AI workflow.
+
+Recommend `External coding agent + MCPForUnity` for Codex or other external agent orchestration.
+
+Use `file-only fallback` only when bridge setup is unavailable or intentionally skipped.
+
+Record the selected `editor_bridge_mode` as `unity_ai_assistant`, `mcpforunity`, or `file_only`.
+
+## Unity Editor Bridge Setup
+
+### Unity AI Assistant / Official MCP
+
+Check these surfaces before claiming Unity AI Assistant or Official MCP readiness:
+
+- Unity version from `ProjectSettings/ProjectVersion.txt` or the active Editor.
+- Unity project markers exist: `Assets/`, `Packages/manifest.json`, and `ProjectSettings/ProjectVersion.txt`.
+- Unity Cloud project link state.
+- `com.unity.ai.assistant` in `Packages/manifest.json` or Package Manager evidence.
+- `AI > Assistant` menu or panel availability in the Unity Editor.
+- In-editor Unity AI terms acceptance state.
+- Unity AI subscription, trial, and seat availability for the signed-in user.
+- Official MCP connection state.
+- Unity AI Assistant skills folder, such as `%APPDATA%\Unity\AIAssistantSkills`.
+
+Ask for approval before:
+
+- installing `com.unity.ai.assistant`
+- changing the Unity Cloud project link
+- guiding subscription, trial, or seat changes
+- configuring the Official MCP connection
+- writing Unity AI Assistant skills
+
+Do not accept terms, buy subscriptions, start trials, assign seats, or change Cloud links for the user.
+
+### External Coding Agent + MCPForUnity
 
 Explain that MCPForUnity will be installed/configured and ask for approval before installing packages, changing `Packages/manifest.json`, running configurators, editing Codex config, or creating skill files.
 
@@ -177,64 +227,100 @@ Configure Codex through the MCPForUnity configurator when possible. Mention affe
 
 If Codex must be restarted for MCP server or skill discovery changes to take effect, tell the user exactly when the restart is required.
 
+Verify the active MCPForUnity instance before trusting Editor-backed evidence:
+
+- confirm the active instance points at this project
+- confirm `Application.dataPath` through MCPForUnity
+- check tool group visibility, such as `manage_tools list_groups`
+- run `sync` when tool visibility is stale
+- activate needed groups such as `testing`, `docs`, `ui`, `vfx`, and `animation`
+- gather console, import, and test evidence where tool groups allow it
+
+### File-Only Fallback
+
+Use file-only fallback when Unity Editor Bridge setup is unavailable or intentionally skipped.
+
+Allowed evidence:
+
+- static project files
+- `Packages/manifest.json`
+- C# syntax checks if available
+- Git state
+- docs and plans
+
+Not allowed:
+
+- compile completion claims
+- import completion claims
+- runtime completion claims
+- scene completion claims
+- prefab completion claims
+
+State file-only limitations in the final report.
+
 ## Verification Ladder
 
 Use this ladder after initialization or when auditing an existing folder. Stop at the highest evidence level available and report any missing surface.
 
-1. Project identity:
+1. Active bridge mode:
+   - record `editor_bridge_mode` as `unity_ai_assistant`, `mcpforunity`, `file_only`, or explicit unknown with reason
+2. Project identity:
    - confirm Unity version from `ProjectSettings/ProjectVersion.txt`
-   - confirm `Application.dataPath` through MCPForUnity
-2. MCP connection and editor state:
-   - query editor state through MCPForUnity
-   - if MCPForUnity is unavailable, state that Editor control and runtime verification are not available
-3. Multi-instance active target:
+   - confirm `Application.dataPath` through the active bridge when available
+   - use equivalent Unity-observed evidence when available
+   - report file-only limitation when no Editor bridge is available
+3. Bridge connection and editor state:
+   - for Unity AI Assistant, verify Official MCP connection and Editor-observed readiness
+   - for MCPForUnity, query editor state through MCPForUnity
+   - if no Unity Editor Bridge is available, state that Editor control and runtime verification are not available
+4. Multi-instance active target:
    - if multiple Unity Editors are open, confirm the active target points at this project before scene, prefab, asset, package, or test changes
-   - use MCPForUnity active instance controls such as `set_active_instance` when available
-4. Tool groups:
-   - run `manage_tools list_groups`
-   - run `sync` when tool visibility is stale
-   - activate needed groups such as `testing`, `docs`, `ui`, `vfx`, and `animation`
-5. Compile and console:
-   - prefer `validate_script`, `refresh_unity`, and `read_console`
-   - if MCPForUnity is unavailable, report that compile and console evidence is limited to file-state or external batchmode checks
-6. Import and target verification:
+   - when using MCPForUnity, use active instance controls such as `set_active_instance` when available
+5. Bridge tool or evidence surface:
+   - for Unity AI Assistant, record Official MCP connection and available in-Editor evidence
+   - when using MCPForUnity, run `manage_tools list_groups`
+   - when using MCPForUnity, run `sync` when tool visibility is stale
+   - when using MCPForUnity, activate needed groups such as `testing`, `docs`, `ui`, `vfx`, and `animation`
+6. Compile and console:
+   - use active bridge evidence or direct Unity-observed evidence when available
+   - when using MCPForUnity, prefer `validate_script`, `refresh_unity`, and `read_console`
+   - if no Unity Editor Bridge is available, report that compile and console evidence is limited to file-state or external batchmode checks
+7. Import and target verification:
    - for newly generated projects, run batchmode import and capture the log path
    - switch each requested target platform in batchmode, for example `StandaloneWindows64` and `Android`
    - after target checks, restore the user's preferred working target if they named one
    - scan the final authoritative logs for `error CS`, `Scripts have compiler errors`, `return code 1`, `Aborting batchmode`, `Exception`, and `Error`
    - distinguish stale errors in earlier failed logs from the final target verification logs
-7. Test readiness:
+8. Test readiness:
    - run an EditMode smoke test when the Test Framework is available
    - run a PlayMode smoke test when project startup allows it
-   - use MCPForUnity `run_tests` and `get_test_job` where available
-8. Final report:
+   - when using MCPForUnity, use `run_tests` and `get_test_job` where available
+9. Final report:
    - project path
    - Unity version
-   - creation path used: Unity command, Unity Hub/manual, or `ProjectData~` fallback
-   - template package and display name when known
+   - creation path
+   - template
    - render pipeline
-   - target platforms requested and verified
-   - manifest compatibility changes
+   - target platform
+   - manifest changes
    - Git state
-   - remote state
-   - Git LFS state if considered
-   - MCPForUnity package/config state
-   - active MCPForUnity target evidence
-   - enabled tool groups
-   - import, compile, console, and target-switch evidence
-   - EditMode and PlayMode readiness
-   - limitations when only file checks were possible
+   - editor_bridge_mode
+   - bridge_state
+   - identity_evidence
+   - compile/console evidence
+   - test readiness
+   - limitations
    - next recommended skill
 
 ## Safety Constraints
 
 - Do not delete existing Unity assets, scenes, prefabs, `.meta` files, packages, or `ProjectSettings/` content.
-- Do not initialize Git, install packages, edit Codex config, configure MCPForUnity, add remotes, or configure Git LFS without approval.
+- Do not initialize Git, install packages, edit Codex/MCP config, configure Unity Editor Bridge, add remotes, or configure Git LFS without approval.
 - Do not trust `Unity.exe -createProjectTemplate` until a temporary smoke project proves the generated manifest and template surfaces match the user's request.
 - Do not use `ProjectData~` fallback as a blind overwrite. Treat every existing `Assets/`, `Packages/`, and `ProjectSettings/` collision as a merge decision.
 - If multiple Unity Editors are open, confirm the active instance before scene, prefab, asset, package, or test changes.
 - Do not claim Unity Editor, runtime, compile, console, EditMode, or PlayMode verification from file-only checks.
-- Report limitations plainly when MCPForUnity, Unity Hub, installed Editors, or network version checks are unavailable.
+- Report limitations plainly when Unity Editor Bridge setup, Unity AI Assistant, Official MCP, MCPForUnity, Unity Hub, installed Editors, or network version checks are unavailable.
 - Preserve unrelated user or agent edits. If an existing file must be merged, inspect it first and make the smallest project-setup change.
 
 ## Next Skill Routing

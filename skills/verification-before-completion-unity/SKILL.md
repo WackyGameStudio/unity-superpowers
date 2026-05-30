@@ -17,13 +17,14 @@ Claiming Unity work is complete without verification is dishonesty, not efficien
 
 Before claiming Unity work is complete, gather fresh evidence:
 
-1. Target identity: MCPForUnity active instance.
-2. Project identity: `Application.dataPath` queried through MCPForUnity.
-3. Compile state: wait until Unity is not compiling.
-4. Console: read errors and warnings after refresh/domain reload.
-5. Tests: run relevant EditMode and PlayMode tests.
-6. Asset proof: inspect changed prefabs, scenes, ScriptableObjects, packages, asmdefs, and `.meta` files.
-7. Runtime proof: run scene/prefab smoke or manual check when behavior is visual, physics-driven, animation-driven, or input-driven.
+1. Active bridge mode: `unity_ai_assistant`, `mcpforunity`, `file_only`, or explicit unknown.
+2. Project identity: `Application.dataPath` through the active bridge when available, equivalent Unity-observed evidence, or file-only limitation.
+3. Compile/import/console evidence.
+4. EditMode/PlayMode evidence.
+5. Asset proof for changed scenes, prefabs, `ScriptableObject` assets, packages, asmdefs, and `.meta` files.
+6. Scene/prefab smoke evidence.
+7. Runtime proof for visual, physics-driven, animation-driven, input-driven, or scene-wired behavior.
+8. Limitation report when any required evidence cannot be gathered.
 
 Do not claim Unity Editor or runtime verification if only file-state checks ran.
 
@@ -39,7 +40,7 @@ If you have not run the verification command in this message, you cannot claim i
 
 Before claiming any status or expressing satisfaction:
 
-1. **IDENTIFY:** What command or MCPForUnity evidence proves this claim?
+1. **IDENTIFY:** What command or active bridge evidence proves this claim?
 2. **RUN:** Execute the full command or tool call fresh.
 3. **READ:** Read full output, exit code, console entries, and failure counts.
 4. **VERIFY:** Does output confirm the claim?
@@ -106,7 +107,7 @@ BAD: "I've written a regression test" without red-green verification
 **Unity compile and console:**
 
 ```text
-GOOD: refresh_unity -> read_console -> no new relevant errors -> "Unity compile/console check is clean"
+GOOD: active bridge compile/console evidence, or for mcpforunity: refresh_unity -> read_console -> no new relevant errors -> "Unity compile/console check is clean"
 BAD: "Files look correct" or "static check passed"
 ```
 
@@ -155,4 +156,4 @@ From repeated failure patterns:
 
 No shortcuts for verification.
 
-Run the command or MCPForUnity tool. Read the output. Then claim the result.
+Run the command, active bridge tool, or evidence path. Read the output. Then claim the result.

@@ -119,7 +119,7 @@ Use the least powerful model that can handle each role to conserve cost and incr
 **Task complexity signals:**
 - Touches 1-2 pure C# files with a complete spec - cheap model
 - Touches multiple files or Unity integration surfaces - standard model
-- Requires scene/prefab/package/MCPForUnity judgment, architecture, or broad codebase understanding - most capable model
+- Requires scene/prefab/package/Editor bridge judgment, architecture, or broad codebase understanding - most capable model
 
 ## Handling Implementer Status
 
@@ -178,12 +178,12 @@ Code reviewer: Strengths: focused pure C# boundary and real tests. Issues: None.
 Task 2: Player prefab wiring
 
 [Get Task 2 text and context]
-[Dispatch implementer with prefab path, serialized fields, MCPForUnity target requirement, and prefab smoke expectation]
+[Dispatch implementer with prefab path, serialized fields, Editor bridge target requirement, and prefab smoke expectation]
 
 Implementer:
   - Added PlayerInteractor component to Assets/Prefabs/Player.prefab
   - Wired interaction layer mask and InteractionPrompt reference
-  - refresh_unity/read_console: no new relevant errors
+  - for `mcpforunity`: `refresh_unity`/`read_console` shows no new relevant errors; otherwise active-bridge compile/console evidence or fallback log
   - Prefab smoke: required serialized references present
   - Committed
 

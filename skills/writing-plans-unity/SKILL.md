@@ -1,15 +1,15 @@
 ---
 name: writing-plans-unity
-description: Use when an approved Unity design or requirements need an implementation plan, or when reviewing an existing Unity spec/plan before execution, before touching code, scenes, prefabs, assets, packages, tests, or MCPForUnity tools
+description: Use when an approved Unity design or requirements need an implementation plan, or when reviewing an existing Unity spec/plan before execution, before touching code, scenes, prefabs, assets, packages, tests, or active bridge tools or evidence
 ---
 
 # Writing Unity Implementation Plans
 
 ## Overview
 
-Write comprehensive Unity implementation plans assuming the engineer has zero project context. A Unity plan is not complete until it names the code, scene, prefab, asset, serialized-field, package/settings, MCPForUnity, and verification surfaces needed to make the feature real in the Editor and at runtime.
+Write comprehensive Unity implementation plans assuming the engineer has zero project context. A Unity plan is not complete until it names the code, scene, prefab, asset, serialized-field, package/settings, Editor bridge, and verification surfaces needed to make the feature real in the Editor and at runtime.
 
-Assume the implementer is a skilled developer, but does not know this Unity project, its scene hierarchy, prefab conventions, package state, test setup, or MCPForUnity target. Give them bite-sized, executable tasks with exact paths, exact wiring, exact commands, and expected evidence. DRY. YAGNI. TDD when automated tests are feasible. Frequent commits when the workspace is git-backed.
+Assume the implementer is a skilled developer, but does not know this Unity project, its scene hierarchy, prefab conventions, package state, test setup, or active Editor bridge target. Give them bite-sized, executable tasks with exact paths, exact wiring, exact commands, and expected evidence. DRY. YAGNI. TDD when automated tests are feasible. Frequent commits when the workspace is git-backed.
 
 **Announce at start:** "I'm using the writing-plans-unity skill to create the implementation plan."
 
@@ -29,7 +29,7 @@ If the user writes in Korean, write the plan's explanations, task details, assum
 Keep exact technical identifiers unchanged:
 
 - file paths, class names, method names, namespaces, package names, shader names, scene/prefab/asset names
-- Unity API names such as `MonoBehaviour`, `ScriptableObject`, `Rigidbody`, `Animator`, `MCPForUnity`, `EditMode`, and `PlayMode`
+- Unity API names such as `MonoBehaviour`, `ScriptableObject`, `Rigidbody`, `Animator`, `EditMode`, and `PlayMode`
 - commands, code blocks, branch names, commit message examples, URLs, and quoted source text
 
 When using subagents, include the required prose language in every subagent prompt. Plan reviewers must check that body content follows the user's language while preserving technical identifiers and allowing template labels.
@@ -51,8 +51,8 @@ Before defining tasks, map every relevant Unity implementation surface. Plans MU
 - physics layers, colliders, triggers, Rigidbody settings, NavMesh, `WheelCollider`, and query masks
 - EditMode test files
 - PlayMode test files and PlayMode test scenes
-- MCPForUnity tools to use, including target identity checks when Editor work is involved
-- file-state limitations to report when MCPForUnity is unavailable, stale, or aimed at the wrong project
+- active bridge tools or evidence to use, including active Editor bridge target identity checks when Editor work is involved
+- file-state limitations to report when no Editor bridge is available, or when the active bridge is stale or aimed at the wrong project
 - console, compile, and domain reload checks
 - manual verification with a reason only when automation is infeasible
 
@@ -98,13 +98,13 @@ Every plan MUST start with this header:
 
 **Goal:** [One sentence describing the Unity feature or project setup result]
 
-**Unity Surface:** [Scenes, prefabs, assets, scripts, packages, ProjectSettings, asmdefs, tests, and MCPForUnity/editor surfaces touched]
+**Unity Surface:** [Scenes, prefabs, assets, scripts, packages, ProjectSettings, asmdefs, tests, and Editor bridge surfaces touched]
 
 **Architecture:** [2-3 sentences naming MonoBehaviour boundaries, State/Strategy/interface/ScriptableObject decisions, and scene/prefab wiring]
 
-**Verification:** [Compile, console, EditMode, PlayMode, scene/prefab smoke, MCPForUnity, or manual evidence with reason]
+**Verification:** [Compile, console, EditMode, PlayMode, scene/prefab smoke, Editor bridge, or manual evidence with reason]
 
-**Tech Stack:** [Unity version if known, render pipeline, packages, input system, test framework, MCP tools]
+**Tech Stack:** [Unity version if known, render pipeline, packages, input system, test framework, active bridge tools]
 
 ---
 ```
@@ -144,10 +144,11 @@ Each Unity task MUST include these fields. Use `None` only after checking the su
 - PlayMode: `Assets/Tests/PlayMode/.../ExactTests.cs` / test scene path or `None`
 - TDD: [red/green/refactor steps when automated tests are feasible; otherwise manual-only reason]
 
-**MCPForUnity:**
-- Target identity: [active instance/project check plus `Application.dataPath` evidence where Editor work is involved]
-- Tools: [`manage_scene`, `manage_prefabs`, `manage_asset`, `manage_scriptable_object`, `validate_script`, `refresh_unity`, `read_console`, `run_tests`, or `None`]
-- Limitation: [state explicitly when MCPForUnity is unavailable and Editor/runtime proof cannot be claimed]
+**Editor Bridge:**
+- Mode: [`unity_ai_assistant` | `mcpforunity` | `file_only` | unknown with reason]
+- Target identity: [active bridge/project check plus `Application.dataPath` or equivalent evidence where Editor work is involved]
+- Tool/evidence path: [Unity AI Assistant/Official MCP, direct Unity observation, file-only limitation, or for `mcpforunity`: `validate_script`, `refresh_unity`, `read_console`, `run_tests`, `manage_scene`, `manage_prefabs`, `manage_asset` as applicable]
+- Limitation: [state explicitly when no Editor bridge is available and Editor/runtime proof cannot be claimed]
 
 **Verification:**
 - Expected evidence: [compile/domain reload result, console result, EditMode/PlayMode output, scene smoke, prefab smoke, runtime/manual observation with reason]
@@ -160,7 +161,7 @@ Each Unity task MUST include these fields. Use `None` only after checking the su
 
 - [ ] **Step 2: Run the test and verify RED**
 
-Run: `[exact MCPForUnity run_tests command or explicit infeasible-automation reason]`
+Run: `[exact EditMode/PlayMode command, active bridge test command, batchmode test command, or explicit infeasible-automation reason]`
 Expected: `FAIL` for the missing behavior, not a setup error.
 
 - [ ] **Step 3: Implement the minimal code**
@@ -205,7 +206,7 @@ git commit -m "[type]: [short Unity task result]"
 
 The task template above is also structural. English labels and checklist titles may be used as-is. The body content under each label should use the user's language while preserving exact Unity identifiers and paths.
 
-When automated tests are feasible, the task MUST include red, green, and refactor steps. When automation is infeasible, the task MUST say why and replace RED/GREEN with precise Unity evidence such as MCPForUnity inspection, console output, scene smoke, prefab smoke, or manual observation.
+When automated tests are feasible, the task MUST include red, green, and refactor steps. When automation is infeasible, the task MUST say why and replace RED/GREEN with precise Unity evidence such as Editor bridge inspection, console output, scene smoke, prefab smoke, or manual observation.
 
 ## Plan Rejection Rules
 
@@ -216,7 +217,7 @@ Reject and rewrite the plan if any of these are true:
 - It claims Unity runtime or Editor verification from file-only checks.
 - It adds a `MonoBehaviour` without explaining where it is attached and how required serialized fields are assigned.
 - It adds an interface, `State`, `Strategy`, event, factory, or `ScriptableObject` without showing the scene/prefab/code wiring that makes it active.
-- It uses MCPForUnity without checking the active target.
+- It uses any Editor bridge without checking the active target.
 
 ## No Placeholders
 
@@ -227,7 +228,7 @@ Every step must contain the actual content an engineer needs. These are plan fai
 - "Write tests for the above" without actual test code or an explicit infeasible-automation reason
 - "Wire it in the prefab" without the exact prefab path, component, field, and expected value/reference
 - "Update the scene" without the exact scene path, GameObject, component, and serialized field changes
-- "Run tests" without exact EditMode, PlayMode, MCPForUnity command, or infeasible-automation reason and expected evidence
+- "Run tests" without exact EditMode, PlayMode, Editor bridge command, or infeasible-automation reason and expected evidence
 - "Similar to Task N"; repeat the content because the engineer may read tasks out of order
 - References to types, functions, methods, assets, scenes, or prefabs not defined in any task
 
@@ -246,13 +247,13 @@ After writing the complete plan, review it against the approved design or requir
 
 **1. Design coverage:** For each design requirement, can you point to a task that maps it to code plus Unity surfaces and evidence? If a requirement touches behavior, the mapping must include where it lives in `Assets/`, where it is wired in scene/prefab/assets, and how it is verified.
 
-**2. Unity surface coverage:** For every task, check the `Code`, `Scene`, `Prefab`, `Asset`, `Package/Settings`, `Test`, `MCP/Fallback`, and `Verification` fields. Required Unity surfaces must be exact; irrelevant surfaces must say `None`.
+**2. Unity surface coverage:** For every task, check the `Code`, `Scene`, `Prefab`, `Asset`, `Package/Settings`, `Test`, `Editor Bridge`, and `Verification` fields. Required Unity surfaces must be exact; irrelevant surfaces must say `None`.
 
 **3. Architecture consistency:** Do MonoBehaviour boundaries, interfaces, `State`, `Strategy`, factory, observer/event, and `ScriptableObject` decisions match the approved design and source-grounded Unity architecture rules?
 
 **4. Wiring consistency:** Do serialized field names, GameObject names, prefab paths, scene paths, Animator parameter names, layer names, package names, asmdef references, and asset paths match across tasks?
 
-**5. Evidence consistency:** Does each task define the expected compile/domain reload, console, EditMode, PlayMode, scene smoke, prefab smoke, MCPForUnity, or manual evidence? Manual evidence must include the reason automation is infeasible.
+**5. Evidence consistency:** Does each task define the expected compile/domain reload, console, EditMode, PlayMode, scene smoke, prefab smoke, Editor bridge, or manual evidence? Manual evidence must include the reason automation is infeasible.
 
 **6. Placeholder scan:** Search your plan for the red flags from "No Placeholders" and "Plan Rejection Rules." Fix every hit.
 

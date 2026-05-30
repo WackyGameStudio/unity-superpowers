@@ -9,7 +9,7 @@ description: Use after Unity work reveals a reusable solved problem, workaround,
 
 Capture solved Unity learnings while context is fresh. Write one final learning doc to `docs/solutions/` so future Unity agent work can reuse the blocker, workaround, solution, architecture decision, scene/prefab wiring lesson, or verification gap.
 
-Unity work often depends on Editor state, package state, MCPForUnity routing, scene/prefab serialization, `.meta` GUIDs, asmdefs, compile/domain reload timing, PlayMode timing, Input System wiring, `ScriptableObject` references, and asset loading. Capture both solved problems and cases where the first approach was blocked and another route worked.
+Unity work often depends on Editor state, package state, Unity Editor Bridge routing, scene/prefab serialization, `.meta` GUIDs, asmdefs, compile/domain reload timing, PlayMode timing, Input System wiring, `ScriptableObject` references, and asset loading. Capture both solved problems and cases where the first approach was blocked and another route worked.
 
 The output is one durable learning under `docs/solutions/`, written in the user's conversation language by default.
 
@@ -29,13 +29,13 @@ Headless mode never stops for consent. If no solved and verified Unity lesson is
 
 Docs created by this skill are read later by Unity skills, not left as passive notes:
 
-- `using-superpowers-unity`: at session startup and during targeted `docs/solutions/` search by feature, subsystem, path, scene, prefab, error, package, MCP tool, or test mode.
+- `using-superpowers-unity`: at session startup and during targeted `docs/solutions/` search by feature, subsystem, path, scene, prefab, error, package, bridge mode, MCP tool, or test mode.
 - `brainstorming-unity`: before design questions when the requested topic matches a prior Unity lesson.
 - `writing-plans-unity`: before task planning and task decomposition, especially when a lesson names scenes, prefabs, asmdefs, packages, or verification surfaces.
-- `systematic-debugging-unity`: before root-cause investigation so known MCPForUnity, Editor, serialization, timing, or package failures are not rediscovered from scratch.
+- `systematic-debugging-unity`: before root-cause investigation so known active Editor bridge, MCPForUnity-specific, Editor, serialization, timing, or package failures are not rediscovered from scratch.
 - `subagent-driven-development-unity`: when constructing subagent prompts so each agent receives relevant blockers, ownership boundaries, and verification expectations.
 - `verification-before-completion-unity`: before final claims so prior verification gaps and required evidence shape the completion check.
-- `unity-init`: before MCP/project setup repair when setup, active target identity, tool group, Codex config, or project identity issues are documented.
+- `unity-init`: before Editor bridge/project setup repair when setup, active target identity, bridge tool group, Codex config, or project identity issues are documented.
 
 Search narrowly. Use the current feature, Unity subsystem, path, scene name, prefab name, package, error message, MCP tool, test mode, or architecture pattern. Do not bulk-read the entire knowledge store by default.
 
@@ -43,7 +43,9 @@ Search narrowly. Use the current feature, Unity subsystem, path, scene name, pre
 
 Create or update a learning when the work reveals reusable knowledge about:
 
-- MCPForUnity connection/config/tool group issues
+- Unity Editor Bridge connection/config/target issues
+- Unity AI Assistant / Official MCP package, Cloud link, terms, seat/subscription/trial, restart, or connection issues
+- MCPForUnity connection/config/tool group issues when bridge mode is `mcpforunity`
 - multi-instance routing/active target drift
 - compile/domain reload waiting
 - console diagnostics
@@ -100,9 +102,10 @@ The orchestrator writes only one final `docs/solutions/<category>/<filename>.md`
 5. Search existing `docs/solutions/` narrowly for overlap. In Full mode, update an existing doc when it already covers the same problem, root cause, and solution. In Lightweight mode, a focused new doc is acceptable when overlap is uncertain.
 6. Assemble the doc with `assets/resolution-template.md`.
 7. Include concrete Unity evidence:
-   - MCPForUnity target checks and `Application.dataPath` evidence when target identity mattered.
+   - active Editor bridge mode, target identity, and `Application.dataPath` or equivalent evidence when target identity mattered.
+   - MCPForUnity target checks when bridge mode is `mcpforunity`.
    - compile/domain reload wait evidence when relevant.
-   - console diagnostics, including `read_console` or fallback output.
+   - console diagnostics, using MCPForUnity `read_console` when `editor_bridge` is `mcpforunity`, otherwise active-bridge console evidence or fallback log output.
    - EditMode, PlayMode, scene smoke, prefab smoke, asset inspection, or manual runtime evidence with a reason when automation was not feasible.
 8. Write exactly one final doc under `docs/solutions/<category>/<filename>.md`.
 9. Run schema validation against `references/schema.yaml` and `references/yaml-schema.md`: validate required fields, track-specific fields, enum values, category mapping, and Unity component/tag specificity. Fix schema validation failures before continuing.
@@ -145,7 +148,7 @@ An optional instruction-file edit is allowed only when the Discoverability Check
 - What did not work: first approach, blocked path, stale target, bad package route, wrong test mode, or incomplete verification.
 - Solution: exact fix, workaround, wiring, command, package change, scene/prefab change, or process adjustment.
 - Why this works: Unity-specific root cause and why the solution addresses it.
-- Unity evidence: compile, console, target identity, EditMode, PlayMode, scene smoke, prefab smoke, asset inspection, or manual proof.
+- Unity evidence: bridge mode, target identity, compile, console, EditMode, PlayMode, scene smoke, prefab smoke, asset inspection, or manual proof.
 - Prevention: small rule future Unity skills should apply before repeating the mistake.
 - Related docs: prior `docs/solutions/` entries, issues, source-analysis docs, or package references.
 
@@ -171,7 +174,7 @@ Use `references/yaml-schema.md` for the canonical mapping. Category directories 
 - `documentation-gaps/`
 - `best-practices/`
 
-Use `component` and `tags` to distinguish MCPForUnity, scene, prefab, asmdef, package, PlayMode, Input System, and other Unity-specific surfaces inside those categories.
+Use `editor_bridge`, `component`, and `tags` to distinguish Unity AI Assistant / Official MCP, MCPForUnity, file-only evidence, scene, prefab, asmdef, package, PlayMode, Input System, and other Unity-specific surfaces inside those categories.
 
 ## Headless Report
 

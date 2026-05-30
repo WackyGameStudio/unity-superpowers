@@ -24,7 +24,7 @@ If the user writes in Korean, write the spec's explanations, assumptions, design
 Keep exact technical identifiers unchanged:
 
 - file paths, class names, method names, namespaces, package names, shader names, scene/prefab/asset names
-- Unity API names such as `MonoBehaviour`, `ScriptableObject`, `Rigidbody`, `Animator`, `MCPForUnity`, `EditMode`, and `PlayMode`
+- Unity API names such as `MonoBehaviour`, `ScriptableObject`, `Rigidbody`, `Animator`, `EditMode`, and `PlayMode`
 - commands, code blocks, branch names, commit message examples, URLs, and quoted source text
 
 When dispatching a spec reviewer, include the required prose language in the prompt. The reviewer must check body content language while allowing English template labels and exact technical identifiers.
@@ -49,7 +49,7 @@ Use these Unity axes to decide what to ask and what the design must settle:
 - Package dependencies/render pipeline
 - Multiplayer/networking
 - Editor tooling/custom inspector
-- verification surface: pure C#, EditMode, PlayMode, scene smoke, prefab smoke, MCPForUnity
+- verification surface: pure C#, EditMode, PlayMode, scene smoke, prefab smoke, Editor bridge
 
 ## Anti-Pattern: "This Is Too Simple To Need A Design"
 
@@ -123,7 +123,7 @@ digraph brainstorming {
 - If only some implementers need a capability, add a new interface instead of expanding an existing interface.
 - If data should be designer-tunable, use `ScriptableObject`.
 - If scene or prefab wiring is required, include it in the design.
-- If MCPForUnity verification is possible, design for fresh evidence.
+- If Editor bridge verification is possible, design for fresh evidence.
 
 **Presenting the design:**
 
@@ -131,7 +131,7 @@ digraph brainstorming {
 - Scale each section to its complexity: a few sentences if straightforward, up to 200-300 words if nuanced
 - Ask after each section whether it looks right so far
 - Cover: architecture, components, data flow, scene/prefab/asset wiring, GameObject/component ownership, data or `ScriptableObject` configuration, error handling, testing, and verification
-- For Unity designs, explicitly name the expected scene objects, prefab or asset changes, serialized references, package/render-pipeline assumptions, and verification surface: pure C#, EditMode, PlayMode, scene smoke, prefab smoke, or MCPForUnity
+- For Unity designs, explicitly name the expected scene objects, prefab or asset changes, serialized references, package/render-pipeline assumptions, and verification surface: pure C#, EditMode, PlayMode, scene smoke, prefab smoke, or Editor bridge
 - Be ready to go back and clarify if something doesn't make sense
 
 **Design for isolation and clarity:**

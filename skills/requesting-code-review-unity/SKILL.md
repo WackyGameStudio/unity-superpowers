@@ -19,8 +19,9 @@ Review code and Unity artifacts together:
 - scene, prefab, asset, `.meta`, asmdef, package, and ProjectSettings changes
 - serialized field wiring
 - Editor/runtime assembly separation
-- MCPForUnity target assumptions
+- Editor bridge mode and target assumptions
 - EditMode, PlayMode, console, scene smoke, and prefab smoke evidence
+- bridge mode, identity evidence, Unity evidence gathered, and limitations
 
 Findings must cite exact files and explain the Unity behavior risk.
 

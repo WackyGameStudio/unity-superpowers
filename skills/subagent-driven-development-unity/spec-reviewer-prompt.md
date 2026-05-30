@@ -48,7 +48,7 @@ Task tool (general-purpose):
     **Unity surface compliance:**
     - Were required scene, prefab, asset, ScriptableObject, animation, input, package, asmdef, ProjectSettings, and `.meta` changes actually made?
     - Were serialized fields and object references wired exactly as requested?
-    - If MCPForUnity evidence was required, did they provide target identity and `Application.dataPath` proof or an explicit limitation?
+    - If Editor bridge evidence was required, did they provide active bridge mode, target identity, `Application.dataPath` or equivalent proof, and an explicit limitation when needed?
     - Were required EditMode, PlayMode, console, compile/domain reload, scene smoke, or prefab smoke checks run?
 
     **Extra/unneeded work:**
@@ -66,4 +66,5 @@ Task tool (general-purpose):
     Report:
     - Spec compliant: [if everything matches after code and Unity surface inspection]
     - Issues found: [list specifically what's missing or extra, with file:line references and Unity surface references]
+    - Editor bridge evidence: [Report bridge mode, identity evidence, Unity evidence gathered, and limitations.]
 ```

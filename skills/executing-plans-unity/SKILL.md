@@ -15,7 +15,7 @@ Before executing a Unity plan, confirm:
 
 - `using-git-worktrees-unity` has already set up or verified an isolated workspace, or the user explicitly approved working in place
 - current folder is the intended Unity project or package source
-- MCPForUnity target is correct when Editor operations are required
+- active Editor bridge target identity is checked when Editor operations are required
 - scene/prefab/asset integration tasks are not mixed with unrelated code tasks
 - verification commands include compile, console, tests, and scene/prefab smoke when relevant
 

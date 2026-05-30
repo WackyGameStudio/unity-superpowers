@@ -21,6 +21,42 @@ Install only the root guidance file and `skills/` directory needed by the target
 3. Preserve existing user guidance. Merge intentionally instead of overwriting silently.
 4. Use the user's language for explanations. Keep file paths, skill names, Unity API names, package URLs, and command names unchanged.
 
+## Unity Editor Bridge Install Choice
+
+Install the skill pack first. `unity-init` asks for bridge mode before installing or configuring Editor integration.
+
+Bridge modes:
+
+- `unity_ai_assistant`: Unity AI Assistant + Unity Official MCP Server.
+- `mcpforunity`: external coding agent + MCPForUnity.
+- `file_only`: no Editor bridge; file-state evidence only.
+
+Editor-backed claims require active Editor bridge evidence or directly observed Unity evidence. `file_only` cannot prove compile, import, runtime, scene, or prefab behavior.
+
+### Unity AI Assistant / Official MCP Setup
+
+Use this branch for the official in-Editor AI workflow.
+
+- Unity AI Assistant path may require Unity 6.3+ for the open beta guide flow.
+- Unity AI generally requires Unity 6.0+, an AI package, accepted terms, and a Unity Cloud project link according to the Unity AI product FAQ.
+- `com.unity.ai.assistant` is the AI Assistant package named by Unity support docs.
+- Unity AI seat, subscription, or trial state can affect MCP or AI Gateway connection.
+- Seat changes can require a full Unity Editor restart.
+- Do not buy subscriptions, start trials, assign seats, accept terms, or change Cloud links without user approval.
+
+Links: [Unity AI open beta guide](https://support.unity.com/hc/en-us/articles/48060149523476-Getting-started-with-Unity-AI-open-beta-user-guide), [Unity AI product page](https://unity.com/features/ai/), [Unity AI MCP connection error](https://support.unity.com/hc/en-us/articles/48958235901460-Unity-AI-MCP-Connection-Fails-Unity-AI-Gateway-connection-Error).
+
+### MCPForUnity Setup
+
+Use this branch for an external coding agent with MCPForUnity.
+
+1. In Unity, open `Window > Package Manager > + > Add package from git URL`.
+2. Paste `https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#main`.
+3. After import, open `Window > MCP for Unity`.
+4. Use the setup wizard or client configurator to configure the detected AI client.
+5. Restart or refresh the AI coding agent if MCP tools do not appear.
+6. Before using Unity tools, verify the active MCPForUnity target and `Application.dataPath`.
+
 ## Codex Install
 
 For Codex project-local installation, create or update:
@@ -107,7 +143,8 @@ After installation, verify:
 
 - all 16 skill folders are present
 - every skill folder contains `SKILL.md`
-- installed guidance mentions MCPForUnity as the Unity Editor control path
+- installed guidance defines Unity Editor Bridge modes: `unity_ai_assistant`, `mcpforunity`, and `file_only`
+- installed guidance keeps MCPForUnity setup only under the MCPForUnity Setup branch
 - installed guidance tells the agent not to claim Unity Editor or runtime verification from file-state checks alone
 - existing project-specific guidance was preserved
 

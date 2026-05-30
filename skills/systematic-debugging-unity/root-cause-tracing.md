@@ -2,9 +2,9 @@
 
 ## Overview
 
-Bugs often appear deep in Unity runtime code: a `NullReferenceException` in a controller, a prefab with missing serialized references, an asset generated in the wrong project, or MCPForUnity operating against a stale Editor instance. Fixing where the error appears treats the symptom.
+Bugs often appear deep in Unity runtime code: a `NullReferenceException` in a controller, a prefab with missing serialized references, an asset generated in the wrong project, or an active Editor bridge operating against a stale or wrong Editor instance. Fixing where the error appears treats the symptom.
 
-**Core principle:** Trace backward through the scene, prefab, asset, call chain, and tool target until you find the original trigger, then fix at the source.
+**Core principle:** Trace backward through the scene, prefab, asset, call chain, and active bridge target until you find the original trigger, then fix at the source.
 
 ## When to Use
 
@@ -26,7 +26,7 @@ digraph when_to_use {
 **Use when:**
 - Error happens deep in a MonoBehaviour, system, animation, prefab, or tool operation
 - Stack trace shows a long call chain
-- A serialized reference, generated asset, or MCP target is wrong
+- A serialized reference, generated asset, or active Editor bridge target is wrong
 - Need to find which Unity test or scene setup creates unwanted state
 
 ## The Tracing Process
@@ -110,11 +110,26 @@ Run targeted tests:
 Unity.exe -batchmode -projectPath . -runTests -testPlatform PlayMode -testFilter PlayerAttackTests -testResults TestResults.xml -quit
 ```
 
-If using MCPForUnity, verify the tool target before trusting tool output:
+## Active Editor Bridge Target Evidence
+
+Before trusting tool output, record bridge mode and target evidence:
 
 ```text
-MCP target identity
+editor_bridge: unity_ai_assistant | mcpforunity | file_only | unknown
+project identity evidence
+active scene path
+selected prefab or asset path
+limitations
+```
+
+For Unity AI Assistant / Official MCP, connection tracing may need to include `com.unity.ai.assistant`, Unity Cloud project link, terms, Unity AI seat/subscription/trial state, Editor restart after seat/config changes, and Official MCP connection availability.
+
+If bridge mode is `mcpforunity`, verify the MCPForUnity target before trusting MCP output:
+
+```text
+MCPForUnity target identity
 Application.dataPath
+tool group visibility
 active scene path
 selected prefab or asset path
 ```
@@ -148,7 +163,7 @@ If an asset, scene object, or generated file appears during tests but you do not
 - Layer 1: `OnValidate` warns when required config is missing
 - Layer 2: prefab validation test scans shipped player prefabs
 - Layer 3: PlayMode smoke test attacks once in the representative combat scene
-- Layer 4: MCP/editor verification records active scene and prefab path before completion
+- Layer 4: Editor bridge verification records bridge mode, target identity, active scene, and prefab path before completion
 
 ## Key Principle
 
@@ -174,4 +189,4 @@ digraph principle {
 }
 ```
 
-**Do not fix only where the error appears.** Trace back to the scene, prefab, asset, serialized data, command, or MCP target that introduced it.
+**Do not fix only where the error appears.** Trace back to the scene, prefab, asset, serialized data, command, or active Editor bridge target that introduced it.

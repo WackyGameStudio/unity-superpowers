@@ -45,7 +45,7 @@ For Unity tasks, check for:
 - project instruction files: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`
 - project-local Unity Superpowers skills
 - `docs/solutions/` knowledge store
-- MCPForUnity availability and target identity when Editor work is expected
+- Editor bridge availability, mode, and target identity when Editor work is expected
 
 If `docs/solutions/` exists, do a targeted search before design, planning, debugging, subagent prompting, or verification. Search by current feature, Unity subsystem, scene, prefab, package, error message, MCP tool, or test mode. Do not bulk-read the whole knowledge store.
 

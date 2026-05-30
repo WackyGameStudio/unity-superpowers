@@ -19,15 +19,83 @@ Checks (regex-based, no YAML parser dependency):
     1. File starts and ends frontmatter with `---` lines matched as full lines.
     2. No top-level scalar value contains ` #` unquoted.
     3. No top-level scalar value contains `: ` unquoted.
-
-The script does not flag values starting with YAML reserved indicators
-(`` ` ``, `*`, `&`, `!`, etc.) because those produce loud parser errors
-downstream rather than silent corruption. Use references/yaml-schema.md for
-the full array-item quoting rule.
+    4. No array-of-strings item starts with a reserved indicator unquoted.
+    5. No array-of-strings item contains ` #` or `: ` unquoted.
+    6. No top-level scalar value starts with a reserved indicator unquoted.
+    7. No non-array scalar field uses flow-array syntax unquoted.
 """
 import os
 import re
 import sys
+
+RESERVED_ARRAY_ITEM_STARTS = set("-?:,[]{}#&*!|>'\"%@`")
+FLOW_ARRAY_FIELDS = {
+    "symptoms",
+    "applies_when",
+    "tags",
+    "related_components",
+    "evidence",
+}
+
+
+def is_quoted(value: str) -> bool:
+    return bool(value) and value[0] in "\"'"
+
+
+def split_flow_items(value: str) -> list[str]:
+    inner = value.strip()[1:-1]
+    items: list[str] = []
+    current: list[str] = []
+    quote: str | None = None
+    escape = False
+
+    for char in inner:
+        if escape:
+            current.append(char)
+            escape = False
+            continue
+        if char == "\\" and quote == '"':
+            current.append(char)
+            escape = True
+            continue
+        if quote:
+            current.append(char)
+            if char == quote:
+                quote = None
+            continue
+        if char in "\"'":
+            current.append(char)
+            quote = char
+            continue
+        if char == ",":
+            items.append("".join(current).strip())
+            current = []
+            continue
+        current.append(char)
+
+    items.append("".join(current).strip())
+    return [item for item in items if item]
+
+
+def validate_array_item(item: str, lineno: int, issues: list[str], context: str = "array item") -> None:
+    if not item or is_quoted(item):
+        return
+    if item[0] in RESERVED_ARRAY_ITEM_STARTS:
+        issues.append(
+            f"line {lineno}: {context} starts with '{item[0]}' - quote it. "
+            "YAML may parse the item as a non-string value or nested structure."
+        )
+    if re.search(r"\s#", item):
+        issues.append(
+            f"line {lineno}: {context} contains ' #' - quote it. "
+            "YAML treats space-then-# as a comment delimiter and silently "
+            "drops the rest of the value."
+        )
+    if re.search(r":\s", item):
+        issues.append(
+            f"line {lineno}: {context} contains ': ' - quote it. "
+            "Strict YAML parsers may treat this as a nested mapping."
+        )
 
 
 def usage_fail(msg: str) -> "NoReturn":
@@ -43,7 +111,7 @@ def main(argv: list[str]) -> int:
     if not os.path.isfile(doc_path):
         usage_fail(f"file not found: {doc_path}")
 
-    with open(doc_path, encoding="utf-8") as f:
+    with open(doc_path, encoding="utf-8-sig") as f:
         text = f.read()
 
     issues: list[str] = []
@@ -75,29 +143,50 @@ def main(argv: list[str]) -> int:
         stripped = line.lstrip()
         if not stripped or stripped.startswith("#"):
             continue
+
+        if stripped.startswith("- "):
+            item = stripped[2:].strip()
+            validate_array_item(item, lineno, issues)
+            continue
+
         if ":" not in line:
             continue
         if line.startswith((" ", "\t")):
             continue
-        if stripped.startswith("- "):
-            continue
 
         key, _, val = line.partition(":")
+        key_name = key.strip()
         val_stripped = val.strip()
         if not val_stripped:
             continue
-        if val_stripped[0] in '"\'[{|>':
+        if val_stripped.startswith("[") and val_stripped.endswith("]"):
+            if key_name not in FLOW_ARRAY_FIELDS:
+                issues.append(
+                    f"line {lineno}: '{key_name}' value starts with '[' - quote it "
+                    "or use an array field. YAML parses unquoted brackets as a flow array."
+                )
+                continue
+            for item in split_flow_items(val_stripped):
+                validate_array_item(item, lineno, issues, f"flow array item for '{key_name}'")
             continue
+
+        if val_stripped[0] in '"\'':
+            continue
+        if val_stripped[0] in RESERVED_ARRAY_ITEM_STARTS:
+            issues.append(
+                f"line {lineno}: '{key_name}' value starts with '{val_stripped[0]}' - quote it. "
+                "YAML may parse the value as a non-string value or reject it."
+            )
 
         if re.search(r"\s#", val_stripped):
             issues.append(
-                f"line {lineno}: '{key.strip()}' value contains ' #' - quote it. "
+                f"line {lineno}: '{key_name}' value contains ' #' - quote it. "
                 "YAML treats space-then-# as a comment delimiter and silently "
                 "drops the rest of the value."
             )
         if re.search(r":\s", val_stripped):
             issues.append(
-                f"line {lineno}: '{key.strip()}' value contains ': ' - quote it. "
+                f"line {lineno}: '{key_name}' value contains ': ' - quote it. "
                 "Strict YAML parsers may treat this as a nested mapping."
             )
 
