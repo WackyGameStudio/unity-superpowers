@@ -1,7 +1,6 @@
 ---
 name: compound-unity
 description: Use after Unity work reveals a reusable solved problem, workaround, blocked-then-solved path, Editor/MCP issue, scene/prefab serialization issue, test timing issue, or workflow lesson
-argument-hint: "[optional: brief Unity context] [mode:headless]"
 ---
 
 # Compound Unity
