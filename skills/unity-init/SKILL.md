@@ -29,17 +29,16 @@ Check in this order and report what each check proves.
    - known editor executable paths such as `%ProgramFiles%\Unity\Hub\Editor\<version>\Editor\Unity.exe`
    - any existing `ProjectSettings/ProjectVersion.txt` that names a target Unity version
 4. Unity Editor Bridge:
-   - selected bridge mode: `Unity AI Assistant / Official MCP`, `External coding agent + MCPForUnity`, or `file-only fallback`
+   - selected bridge mode: `Unity AI Assistant / Unity MCP` or `External coding agent + MCPForUnity`
    - `Packages/manifest.json`
-   - Unity AI Assistant package and Official MCP connection when using Unity AI Assistant
+   - Unity AI Assistant package and Unity MCP connection when using Unity AI Assistant
    - MCPForUnity package visibility and Codex config when using MCPForUnity
    - bridge tool or connection visibility
 5. Target identity:
-   - active Editor bridge project when a bridge is available
-   - `Application.dataPath` queried through the active bridge when available
-   - file-only limitation when no bridge is available
+   - active Editor bridge project
+   - `Application.dataPath` queried through the active bridge
 
-If the Unity Editor Bridge is missing, stale, unavailable, or aimed at the wrong project, use only fallback evidence and report that Editor-backed control and runtime verification are unavailable.
+Unity Editor work uses either Unity AI Assistant / Unity MCP or MCPForUnity. Non-Unity file or documentation work can proceed without this skill.
 
 ## No Project Flow
 
@@ -171,23 +170,20 @@ Unity Editor integration을 어떤 방식으로 사용할까요?
 
 Offer these choices:
 
-- `Unity AI Assistant / Official MCP`
+- `Unity AI Assistant / Unity MCP`
 - `External coding agent + MCPForUnity`
-- `file-only fallback`
 
-Recommend `Unity AI Assistant / Official MCP` for the official in-Editor AI workflow.
+Recommend `Unity AI Assistant / Unity MCP` for the official in-Editor AI workflow.
 
 Recommend `External coding agent + MCPForUnity` for Codex or other external agent orchestration.
 
-Use `file-only fallback` only when bridge setup is unavailable or intentionally skipped.
-
-Record the selected `editor_bridge_mode` as `unity_ai_assistant`, `mcpforunity`, or `file_only`.
+Record the selected `editor_bridge_mode` as `unity_ai_assistant` or `mcpforunity`.
 
 ## Unity Editor Bridge Setup
 
-### Unity AI Assistant / Official MCP
+### Unity AI Assistant / Unity MCP
 
-Check these surfaces before claiming Unity AI Assistant or Official MCP readiness:
+Check these surfaces before claiming Unity AI Assistant or Unity MCP readiness:
 
 - Unity version from `ProjectSettings/ProjectVersion.txt` or the active Editor.
 - Unity project markers exist: `Assets/`, `Packages/manifest.json`, and `ProjectSettings/ProjectVersion.txt`.
@@ -196,7 +192,7 @@ Check these surfaces before claiming Unity AI Assistant or Official MCP readines
 - `AI > Assistant` menu or panel availability in the Unity Editor.
 - In-editor Unity AI terms acceptance state.
 - Unity AI subscription, trial, and seat availability for the signed-in user.
-- Official MCP connection state.
+- Unity MCP connection state.
 - Unity AI Assistant skills folder, such as `%APPDATA%\Unity\AIAssistantSkills`.
 
 Ask for approval before:
@@ -204,7 +200,7 @@ Ask for approval before:
 - installing `com.unity.ai.assistant`
 - changing the Unity Cloud project link
 - guiding subscription, trial, or seat changes
-- configuring the Official MCP connection
+- configuring the Unity MCP connection
 - writing Unity AI Assistant skills
 
 Do not accept terms, buy subscriptions, start trials, assign seats, or change Cloud links for the user.
@@ -236,55 +232,29 @@ Verify the active MCPForUnity instance before trusting Editor-backed evidence:
 - activate needed groups such as `testing`, `docs`, `ui`, `vfx`, and `animation`
 - gather console, import, and test evidence where tool groups allow it
 
-### File-Only Fallback
-
-Use file-only fallback when Unity Editor Bridge setup is unavailable or intentionally skipped.
-
-Allowed evidence:
-
-- static project files
-- `Packages/manifest.json`
-- C# syntax checks if available
-- Git state
-- docs and plans
-
-Not allowed:
-
-- compile completion claims
-- import completion claims
-- runtime completion claims
-- scene completion claims
-- prefab completion claims
-
-State file-only limitations in the final report.
-
 ## Verification Ladder
 
 Use this ladder after initialization or when auditing an existing folder. Stop at the highest evidence level available and report any missing surface.
 
 1. Active bridge mode:
-   - record `editor_bridge_mode` as `unity_ai_assistant`, `mcpforunity`, `file_only`, or explicit unknown with reason
+   - record `editor_bridge_mode` as `unity_ai_assistant` or `mcpforunity`
 2. Project identity:
    - confirm Unity version from `ProjectSettings/ProjectVersion.txt`
-   - confirm `Application.dataPath` through the active bridge when available
-   - use equivalent Unity-observed evidence when available
-   - report file-only limitation when no Editor bridge is available
+   - confirm `Application.dataPath` through the active bridge
 3. Bridge connection and editor state:
-   - for Unity AI Assistant, verify Official MCP connection and Editor-observed readiness
+   - for Unity AI Assistant, verify Unity MCP connection and Editor-observed readiness
    - for MCPForUnity, query editor state through MCPForUnity
-   - if no Unity Editor Bridge is available, state that Editor control and runtime verification are not available
 4. Multi-instance active target:
    - if multiple Unity Editors are open, confirm the active target points at this project before scene, prefab, asset, package, or test changes
    - when using MCPForUnity, use active instance controls such as `set_active_instance` when available
 5. Bridge tool or evidence surface:
-   - for Unity AI Assistant, record Official MCP connection and available in-Editor evidence
+   - for Unity AI Assistant, record Unity MCP connection and available in-Editor evidence
    - when using MCPForUnity, run `manage_tools list_groups`
    - when using MCPForUnity, run `sync` when tool visibility is stale
    - when using MCPForUnity, activate needed groups such as `testing`, `docs`, `ui`, `vfx`, and `animation`
 6. Compile and console:
-   - use active bridge evidence or direct Unity-observed evidence when available
+   - use selected active bridge evidence
    - when using MCPForUnity, prefer `validate_script`, `refresh_unity`, and `read_console`
-   - if no Unity Editor Bridge is available, report that compile and console evidence is limited to file-state or external batchmode checks
 7. Import and target verification:
    - for newly generated projects, run batchmode import and capture the log path
    - switch each requested target platform in batchmode, for example `StandaloneWindows64` and `Android`
@@ -309,7 +279,7 @@ Use this ladder after initialization or when auditing an existing folder. Stop a
    - identity_evidence
    - compile/console evidence
    - test readiness
-   - limitations
+   - selected_bridge_evidence_gaps
    - next recommended skill
 
 ## Safety Constraints
@@ -319,8 +289,8 @@ Use this ladder after initialization or when auditing an existing folder. Stop a
 - Do not trust `Unity.exe -createProjectTemplate` until a temporary smoke project proves the generated manifest and template surfaces match the user's request.
 - Do not use `ProjectData~` fallback as a blind overwrite. Treat every existing `Assets/`, `Packages/`, and `ProjectSettings/` collision as a merge decision.
 - If multiple Unity Editors are open, confirm the active instance before scene, prefab, asset, package, or test changes.
-- Do not claim Unity Editor, runtime, compile, console, EditMode, or PlayMode verification from file-only checks.
-- Report limitations plainly when Unity Editor Bridge setup, Unity AI Assistant, Official MCP, MCPForUnity, Unity Hub, installed Editors, or network version checks are unavailable.
+- Back Unity Editor, runtime, compile, console, EditMode, and PlayMode verification with Unity AI Assistant / Unity MCP or MCPForUnity evidence.
+- Report selected bridge evidence gaps plainly when Unity Editor Bridge setup, Unity AI Assistant, Unity MCP, MCPForUnity, Unity Hub, installed Editors, or network version checks are unavailable.
 - Preserve unrelated user or agent edits. If an existing file must be merged, inspect it first and make the smallest project-setup change.
 
 ## Next Skill Routing

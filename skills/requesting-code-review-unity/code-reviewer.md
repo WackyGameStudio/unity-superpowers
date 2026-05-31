@@ -60,10 +60,10 @@ Task tool (general-purpose):
     - Tests verify real behavior, not mocks?
     - Relevant EditMode and PlayMode tests run?
     - active Editor bridge target identity checked when Editor work is involved?
-    - Bridge mode, identity evidence, Unity evidence gathered, and limitations reported?
+    - Bridge mode, identity evidence, Unity evidence gathered, and selected bridge evidence gaps reported?
     - Compile/domain reload and Unity console evidence fresh?
     - Scene smoke, prefab smoke, asset inspection, or manual runtime evidence included when behavior depends on Unity runtime state?
-    - File-only verification clearly reported as a limitation?
+    - Unity Editor/runtime verification backed by `unity_ai_assistant` or `mcpforunity` evidence?
 
     **Production readiness:**
     - Backward compatibility considered?
@@ -110,7 +110,7 @@ Task tool (general-purpose):
 
     **Reasoning:** [1-2 sentence technical assessment]
 
-    **Editor bridge evidence:** [Report bridge mode, identity evidence, Unity evidence gathered, and limitations.]
+    **Editor bridge evidence:** [Report bridge mode, identity evidence, Unity evidence gathered, and selected bridge evidence gaps.]
 
     ## Critical Rules
 

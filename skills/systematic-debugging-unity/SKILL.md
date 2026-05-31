@@ -22,7 +22,7 @@ Before proposing a fix, capture current evidence:
 - compile state and domain reload state
 - Unity console errors and warnings
 - package state and asmdef references when compile errors appear
-- active Editor bridge mode, target identity, and limitations
+- active Editor bridge mode, target identity, and selected bridge evidence gaps
 - EditMode or PlayMode reproduction command
 - physics, animation, input, or coroutine timing assumptions
 - related `docs/solutions/` entries if the project has a knowledge store
@@ -33,23 +33,20 @@ Do not patch symptoms until root cause is supported by evidence.
 
 When Editor-backed evidence is involved, identify the active Unity Editor Bridge before trusting tool output:
 
-- `unity_ai_assistant`: Unity AI Assistant / Official MCP.
+- `unity_ai_assistant`: Unity AI Assistant / Unity MCP.
 - `mcpforunity`: external coding agent + MCPForUnity.
-- `file_only`: no Editor bridge; file-state evidence only.
-- `unknown`: bridge state could not be determined; state why.
+Record bridge mode, project identity evidence, Unity evidence gathered, and selected bridge evidence gaps. Unity compile/import/runtime/scene/prefab conclusions should be backed by Unity AI Assistant / Unity MCP or MCPForUnity evidence.
 
-Record bridge mode, project identity evidence, Unity evidence gathered, and limitations. `file_only` cannot prove compile/import/runtime/scene/prefab behavior.
+### Unity AI Assistant / Unity MCP Connection Causes
 
-### Unity AI Assistant / Official MCP Connection Causes
-
-Check these causes when the active bridge should be Unity AI Assistant / Official MCP:
+Check these causes when the active bridge should be Unity AI Assistant / Unity MCP:
 
 - missing `com.unity.ai.assistant`
 - Unity Cloud project not linked
 - terms not accepted
 - Unity AI seat/subscription/trial unavailable
 - Editor restart required after seat/config change
-- Official MCP connection unavailable
+- Unity MCP connection unavailable
 
 ### MCPForUnity Target Checks
 

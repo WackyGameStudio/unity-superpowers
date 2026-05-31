@@ -115,14 +115,14 @@ Unity.exe -batchmode -projectPath . -runTests -testPlatform PlayMode -testFilter
 Before trusting tool output, record bridge mode and target evidence:
 
 ```text
-editor_bridge: unity_ai_assistant | mcpforunity | file_only | unknown
+editor_bridge: unity_ai_assistant | mcpforunity
 project identity evidence
 active scene path
 selected prefab or asset path
-limitations
+selected bridge evidence gaps
 ```
 
-For Unity AI Assistant / Official MCP, connection tracing may need to include `com.unity.ai.assistant`, Unity Cloud project link, terms, Unity AI seat/subscription/trial state, Editor restart after seat/config changes, and Official MCP connection availability.
+For Unity AI Assistant / Unity MCP, connection tracing may need to include `com.unity.ai.assistant`, Unity Cloud project link, terms, Unity AI seat/subscription/trial state, Editor restart after seat/config changes, and Unity MCP connection availability.
 
 If bridge mode is `mcpforunity`, verify the MCPForUnity target before trusting MCP output:
 

@@ -111,7 +111,7 @@ Task tool (general-purpose):
     - Did I wait for compile/domain reload and read the Unity console when scripts or assets changed?
     - Did I verify required EditMode/PlayMode tests or explain why automation is infeasible?
     - Did I inspect changed scenes, prefabs, ScriptableObjects, packages, asmdefs, and `.meta` files when relevant?
-    - Did I avoid claiming runtime or Editor verification from file-state checks alone?
+    - Did I back runtime or Editor verification with Unity AI Assistant / Unity MCP or MCPForUnity evidence?
 
     If you find issues during self-review, fix them now before reporting.
 
@@ -121,7 +121,7 @@ Task tool (general-purpose):
     - **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
     - What you implemented (or what you attempted, if blocked)
     - What you tested and test results
-    - Report bridge mode, identity evidence, Unity evidence gathered, and limitations.
+    - Report bridge mode, identity evidence, Unity evidence gathered, and selected bridge evidence gaps.
     - Files changed
     - Self-review findings (if any)
     - Any issues or concerns

@@ -44,7 +44,7 @@ Search narrowly. Use the current feature, Unity subsystem, path, scene name, pre
 Create or update a learning when the work reveals reusable knowledge about:
 
 - Unity Editor Bridge connection/config/target issues
-- Unity AI Assistant / Official MCP package, Cloud link, terms, seat/subscription/trial, restart, or connection issues
+- Unity AI Assistant / Unity MCP package, Cloud link, terms, seat/subscription/trial, restart, or connection issues
 - MCPForUnity connection/config/tool group issues when bridge mode is `mcpforunity`
 - multi-instance routing/active target drift
 - compile/domain reload waiting
@@ -105,7 +105,7 @@ The orchestrator writes only one final `docs/solutions/<category>/<filename>.md`
    - active Editor bridge mode, target identity, and `Application.dataPath` or equivalent evidence when target identity mattered.
    - MCPForUnity target checks when bridge mode is `mcpforunity`.
    - compile/domain reload wait evidence when relevant.
-   - console diagnostics, using MCPForUnity `read_console` when `editor_bridge` is `mcpforunity`, otherwise active-bridge console evidence or fallback log output.
+   - console diagnostics, using MCPForUnity `read_console` when `editor_bridge` is `mcpforunity`, otherwise Unity AI Assistant / Unity MCP console evidence.
    - EditMode, PlayMode, scene smoke, prefab smoke, asset inspection, or manual runtime evidence with a reason when automation was not feasible.
 8. Write exactly one final doc under `docs/solutions/<category>/<filename>.md`.
 9. Run schema validation against `references/schema.yaml` and `references/yaml-schema.md`: validate required fields, track-specific fields, enum values, category mapping, and Unity component/tag specificity. Fix schema validation failures before continuing.
@@ -174,7 +174,7 @@ Use `references/yaml-schema.md` for the canonical mapping. Category directories 
 - `documentation-gaps/`
 - `best-practices/`
 
-Use `editor_bridge`, `component`, and `tags` to distinguish Unity AI Assistant / Official MCP, MCPForUnity, file-only evidence, scene, prefab, asmdef, package, PlayMode, Input System, and other Unity-specific surfaces inside those categories.
+Use `editor_bridge`, `component`, and `tags` to distinguish Unity AI Assistant / Unity MCP, MCPForUnity, scene, prefab, asmdef, package, PlayMode, Input System, and other Unity-specific surfaces inside those categories.
 
 ## Headless Report
 

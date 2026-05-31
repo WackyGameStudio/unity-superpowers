@@ -565,9 +565,9 @@ Pressure-test Unity skills against these rationalizations:
 
 - "The scripts compile, so scene verification is unnecessary."
 - "The bridge tool succeeded, so it must have targeted the right Unity project."
-- "The active bridge is Unity AI Assistant / Official MCP, but the skill assumes MCPForUnity commands."
-- "The skill claims Editor verification while bridge mode is `file_only`."
-- "Bridge-specific tool names appear in shared guidance instead of a Unity AI Assistant / Official MCP or MCPForUnity subsection."
+- "The active bridge is Unity AI Assistant / Unity MCP, but the skill assumes MCPForUnity commands."
+- "The skill claims Editor verification without Unity AI Assistant / Unity MCP or MCPForUnity evidence."
+- "Bridge-specific tool names appear in shared guidance instead of a Unity AI Assistant / Unity MCP or MCPForUnity subsection."
 - "This can stay in one MonoBehaviour for speed."
 - "Warnings are acceptable because there are no errors."
 - "The prefab wiring is obvious; no need to inspect serialized fields."

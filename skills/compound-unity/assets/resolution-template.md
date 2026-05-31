@@ -8,7 +8,7 @@ Language rule: English headings, labels, YAML keys, and schema enum placeholders
 
 ## Bug/Failure Track Template
 
-Use for Unity blockers, failures, workarounds, and verification gaps classified with preserved `ce-compound` bug values: `build_error`, `test_failure`, `runtime_error`, `performance_issue`, `database_issue`, `security_issue`, `ui_bug`, `integration_issue`, and `logic_error`. Put Unity specificity such as `editor_bridge`, MCPForUnity, scene/prefab, asmdef, package, PlayMode, Input System, or physics timing in `component`, `tags`, `root_cause`, and `resolution_type`.
+Use for Unity blockers, failures, workarounds, and verification gaps classified with preserved `ce-compound` bug values: `build_error`, `test_failure`, `runtime_error`, `performance_issue`, `database_issue`, `security_issue`, `ui_bug`, `integration_issue`, and `logic_error`. Put Unity specificity such as `editor_bridge`, `bridge_tooling`, MCPForUnity, scene/prefab, asmdef, package, PlayMode, Input System, or physics timing in `component`, `tags`, `root_cause`, and `resolution_type`.
 
 YAML safety: array items in `symptoms`, `applies_when`, `tags`, `related_components`, `evidence`, or future array fields must be wrapped in double quotes when they start with a reserved indicator character, contain colon followed by a space, or contain space followed by hash. Reserved indicators are listed in `references/yaml-schema.md`.
 
@@ -20,7 +20,7 @@ category: "[docs/solutions subdirectory]"
 module: "[Unity project area, package, scene, prefab, or workflow]"
 problem_type: "[schema enum]"
 component: "[schema enum]"
-editor_bridge: "[unity_ai_assistant | mcpforunity | file_only | unknown]"
+editor_bridge: "[unity_ai_assistant | mcpforunity]"
 symptoms:
   - "[Observable symptom, error, console entry, or broken behavior]"
 root_cause: "[schema enum]"
@@ -72,7 +72,7 @@ category: "[docs/solutions subdirectory]"
 module: "[Unity project area, package, scene, prefab, or workflow]"
 problem_type: "[schema enum]"
 component: "[schema enum]"
-editor_bridge: "[unity_ai_assistant | mcpforunity | file_only | unknown]"
+editor_bridge: "[unity_ai_assistant | mcpforunity]"
 severity: "[schema enum]"
 applies_when:
   - "[Condition where this guidance applies]"

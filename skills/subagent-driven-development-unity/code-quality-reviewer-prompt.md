@@ -25,7 +25,7 @@ Task tool (general-purpose):
 - Are optional Unity capabilities represented with small interfaces rather than broad inheritance?
 - Are `State`, `Strategy`, events, factories, and `ScriptableObject` assets used only where the plan calls for them?
 - Are scene, prefab, asset, serialized-field, package, asmdef, ProjectSettings, and `.meta` changes intentional and reviewable?
-- Does verification evidence match the Unity surfaces changed: compile, console, EditMode, PlayMode, scene smoke, prefab smoke, active Editor bridge target identity, or explicit limitation?
-- Report bridge mode, identity evidence, Unity evidence gathered, and limitations.
+- Does verification evidence match the Unity surfaces changed: compile, console, EditMode, PlayMode, scene smoke, prefab smoke, active Editor bridge target identity, or selected bridge evidence gaps?
+- Report bridge mode, identity evidence, Unity evidence gathered, and selected bridge evidence gaps.
 
 **Code reviewer returns:** Strengths, Issues (Critical/Important/Minor), Assessment

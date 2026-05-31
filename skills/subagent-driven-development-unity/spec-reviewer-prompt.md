@@ -27,7 +27,7 @@ Task tool (general-purpose):
     - Take their word for what they implemented
     - Trust their claims about completeness
     - Accept their interpretation of requirements
-    - Accept Unity Editor/runtime verification from file-state checks alone
+    - Accept Unity Editor/runtime verification without Unity AI Assistant / Unity MCP or MCPForUnity evidence
 
     **DO:**
     - Read the actual code they wrote
@@ -48,7 +48,7 @@ Task tool (general-purpose):
     **Unity surface compliance:**
     - Were required scene, prefab, asset, ScriptableObject, animation, input, package, asmdef, ProjectSettings, and `.meta` changes actually made?
     - Were serialized fields and object references wired exactly as requested?
-    - If Editor bridge evidence was required, did they provide active bridge mode, target identity, `Application.dataPath` or equivalent proof, and an explicit limitation when needed?
+    - If Editor bridge evidence was required, did they provide active bridge mode, target identity, `Application.dataPath` or equivalent proof?
     - Were required EditMode, PlayMode, console, compile/domain reload, scene smoke, or prefab smoke checks run?
 
     **Extra/unneeded work:**
@@ -66,5 +66,5 @@ Task tool (general-purpose):
     Report:
     - Spec compliant: [if everything matches after code and Unity surface inspection]
     - Issues found: [list specifically what's missing or extra, with file:line references and Unity surface references]
-    - Editor bridge evidence: [Report bridge mode, identity evidence, Unity evidence gathered, and limitations.]
+    - Editor bridge evidence: [Report bridge mode, identity evidence, Unity evidence gathered, and selected bridge evidence gaps.]
 ```

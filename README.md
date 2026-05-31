@@ -53,7 +53,7 @@ Unity Superpowers keeps the original Superpowers discipline: understand before b
 
 The Unity adaptation adds one rule: Unity project state is more than code. Scenes, prefabs, `.meta` files, `ScriptableObject` assets, package manifests, asmdefs, ProjectSettings, serialized fields, layers, Animator parameters, physics settings, and active Editor targets are implementation surfaces. A Unity agent must reason about these surfaces explicitly instead of treating them as afterthoughts.
 
-Architecture guidance is also Unity-specific. Prefer small `MonoBehaviour` responsibilities, GameObject composition, narrow capability interfaces, `State` and transition rules for mode-specific behavior, `Strategy` for variable policy/calculation, and `ScriptableObject` assets for designer-tunable data. Runtime or Editor-backed claims require active bridge evidence, directly observed Unity evidence, tests, console/import checks, scene smoke, prefab smoke, or clearly stated manual evidence.
+Architecture guidance is also Unity-specific. Prefer small `MonoBehaviour` responsibilities, GameObject composition, narrow capability interfaces, `State` and transition rules for mode-specific behavior, `Strategy` for variable policy/calculation, and `ScriptableObject` assets for designer-tunable data. Runtime or Editor-backed claims require Unity AI Assistant / Unity MCP or MCPForUnity evidence, plus tests, console/import checks, scene smoke, prefab smoke, or supplemental manual observation when needed.
 
 ## Skill Guide
 
@@ -71,7 +71,7 @@ Architecture guidance is also Unity-specific. Prefer small `MonoBehaviour` respo
 | `systematic-debugging-unity` | Traces Unity bugs through console logs, Editor state, package/import state, scene/prefab wiring, serialized references, physics timing, and active Editor bridge target mismatches. | Keeps root-cause-first debugging and adds Unity evidence paths before changing code or assets. |
 | `requesting-code-review-unity` | Reviews code and Unity artifacts together: `MonoBehaviour` boundaries, interfaces, state/strategy/data assets, serialized wiring, scene/prefab/asset changes, asmdefs, packages, and evidence. | Keeps early review while making Unity behavior risk part of the review surface. |
 | `receiving-code-review-unity` | Evaluates feedback technically before applying it and verifies Unity-specific claims with compile, console, tests, asset inspection, or runtime evidence. | Keeps review rigor and prevents unverified changes to Unity wiring or architecture. |
-| `verification-before-completion-unity` | Requires active bridge identity, `Application.dataPath` or equivalent Unity-observed evidence when available, compile state, console state, EditMode/PlayMode tests, asset inspection, scene/prefab smoke, or explicit limitation reporting. | Keeps evidence-before-assertions and blocks runtime claims from file-only checks. |
+| `verification-before-completion-unity` | Requires active bridge identity, `Application.dataPath` or equivalent Unity-observed evidence, compile state, console state, EditMode/PlayMode tests, asset inspection, and scene/prefab smoke evidence. | Keeps evidence-before-assertions for Unity Editor and runtime claims. |
 | `finishing-a-development-branch-unity` | Finalizes Unity work only after fresh verification and then guides merge, PR, preserve, discard, or cleanup choices. | Keeps branch completion explicit while protecting Unity assets and generated state. |
 | `compound-unity` | Captures solved Unity blockers and reusable lessons about Editor bridge state, scene/prefab serialization, `.meta` GUIDs, package issues, test timing, and architecture decisions. | Keeps lessons reusable so future agents do not rediscover Unity-specific workarounds. |
 | `writing-skills-unity` | Creates or revises Unity process skills with pressure scenarios involving scene verification, prefab wiring, PlayMode timing, Unity Editor Bridge modes, and oversized `MonoBehaviour` risks. | Keeps skill-writing as TDD for process documentation, with Unity-specific failure modes in the tests. |
@@ -110,7 +110,7 @@ It can also set up the Unity development harness:
 - route bridge-specific setup to the sections below
 - verify the active Unity Editor target before trusting Unity tools
 
-Final reporting from `unity-init` should include the project path, Unity version, creation path, template, render pipeline, target platform, manifest changes, Git state, `editor_bridge_mode`, `bridge_state`, `identity_evidence`, compile/console evidence, test readiness, limitations, and the next recommended skill.
+Final reporting from `unity-init` should include the project path, Unity version, creation path, template, render pipeline, target platform, manifest changes, Git state, `editor_bridge_mode`, `bridge_state`, `identity_evidence`, compile/console evidence, test readiness, selected bridge evidence gaps, and the next recommended skill.
 
 ## Unity Editor Bridge
 
@@ -118,18 +118,16 @@ Unity Editor integration is modeled as `Unity Editor Bridge`, not as one require
 
 Bridge modes:
 
-- `unity_ai_assistant`: Unity AI Assistant + Unity Official MCP Server.
+- `unity_ai_assistant`: Unity AI Assistant + Unity MCP Server.
 - `mcpforunity`: external coding agent + MCPForUnity.
-- `file_only`: no Editor bridge; file-state evidence only.
 
-- `unity-init` asks for bridge mode before installing or configuring Editor integration.
-- Editor-backed claims require active Editor bridge evidence or directly observed Unity evidence.
-- `file_only` cannot prove compile, import, runtime, scene, or prefab behavior.
-- File checks alone are not runtime proof.
+- `unity-init` asks which bridge to use before installing or configuring Editor integration.
+- Editor-backed claims require Unity AI Assistant / Unity MCP or MCPForUnity evidence.
+- Unity Editor work uses either Unity AI Assistant / Unity MCP or MCPForUnity.
 - Scene, prefab, `.meta`, package, asmdef, ProjectSettings, and serialized-field changes are first-class implementation surfaces.
 - Multiple Unity Editor instances must be treated as a routing risk until the active Editor bridge target is verified.
 
-## Unity AI Assistant / Official MCP Setup
+## Unity AI Assistant / Unity MCP Setup
 
 Use this branch for the official in-Editor AI workflow.
 
@@ -146,7 +144,7 @@ Links: [Unity AI open beta guide](https://support.unity.com/hc/en-us/articles/48
 
 ## MCPForUnity Setup
 
-Use this branch for an external coding agent with MCPForUnity. `unity-init` can install and configure it after approval by adding the Unity package to the project, running the MCPForUnity client configurator when available, and checking that Codex can see the Unity MCP tools.
+Use this branch for an external coding agent with MCPForUnity. `unity-init` can install and configure it after approval by adding the Unity package to the project, running the MCPForUnity client configurator when available, and checking that Codex can see MCPForUnity tools.
 
 Manual setup:
 
@@ -157,7 +155,7 @@ Manual setup:
 5. Restart/refresh the AI coding agent if MCP tools do not appear.
 6. Before using Unity tools, verify the active MCPForUnity target and `Application.dataPath`.
 
-Official MCPForUnity docs list Unity 2021.3 LTS or newer, Python 3.10+ with `uv`, and an MCP client as prerequisites. The same docs list Git URL, Asset Store, and OpenUPM install paths.
+MCPForUnity docs list Unity 2021.3 LTS or newer, Python 3.10+ with `uv`, and an MCP client as prerequisites. The same docs list Git URL, Asset Store, and OpenUPM install paths.
 
 Links: [MCP for Unity GitHub](https://github.com/CoplayDev/unity-mcp), [install docs](https://coplaydev.github.io/unity-mcp/getting-started/install), [OpenUPM package](https://openupm.com/packages/com.coplaydev.unity-mcp/).
 

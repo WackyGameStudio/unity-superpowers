@@ -175,7 +175,7 @@ State the correction factually and move on.
 | Assuming reviewer is right | Check if breaks things |
 | Avoiding pushback | Technical correctness > comfort |
 | Partial implementation | Clarify all items first |
-| Can't verify, proceed anyway | State limitation, ask for direction |
+| Can't verify, proceed anyway | State the verification gap, ask for direction |
 
 ## Real Examples
 

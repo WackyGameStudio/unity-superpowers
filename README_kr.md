@@ -53,7 +53,7 @@ Unity Superpowers는 기존 Superpowers의 규율을 유지합니다. 만들기 
 
 Unity 버전에서 추가되는 핵심은 Unity 프로젝트 상태가 코드만이 아니라는 점입니다. Scene, prefab, `.meta` 파일, `ScriptableObject` asset, package manifest, asmdef, ProjectSettings, serialized field, layer, Animator parameter, physics setting, active Editor target은 모두 구현 표면입니다. Unity 에이전트는 이런 표면을 부수적인 정리 작업이 아니라 설계와 구현의 일부로 다뤄야 합니다.
 
-아키텍처도 Unity에 맞춰 압력을 줍니다. 작은 `MonoBehaviour` 책임, GameObject composition, 좁은 capability interface, mode-specific behavior를 위한 `State`와 transition rule, policy/calculation 변형을 위한 `Strategy`, designer-tunable data를 위한 `ScriptableObject` asset을 선호합니다. Runtime 또는 Editor 기반 완료 주장은 active bridge evidence, 직접 관측한 Unity evidence, 테스트, console/import 확인, scene smoke, prefab smoke, 또는 명시적인 manual evidence가 필요합니다.
+아키텍처도 Unity에 맞춰 압력을 줍니다. 작은 `MonoBehaviour` 책임, GameObject composition, 좁은 capability interface, mode-specific behavior를 위한 `State`와 transition rule, policy/calculation 변형을 위한 `Strategy`, designer-tunable data를 위한 `ScriptableObject` asset을 선호합니다. Runtime 또는 Editor 기반 완료 주장은 Unity AI Assistant / Unity MCP 또는 MCPForUnity evidence와 tests, console/import 확인, scene smoke, prefab smoke, 필요 시 보조 manual observation이 필요합니다.
 
 ## 스킬 가이드
 
@@ -71,7 +71,7 @@ Unity 버전에서 추가되는 핵심은 Unity 프로젝트 상태가 코드만
 | `systematic-debugging-unity` | console log, Editor state, package/import state, scene/prefab wiring, serialized reference, physics timing, active Editor bridge target mismatch를 따라 Unity bug를 추적합니다. | root-cause-first debugging을 유지하고 코드나 asset 수정 전에 Unity evidence path를 요구합니다. |
 | `requesting-code-review-unity` | `MonoBehaviour` boundary, interface, state/strategy/data asset, serialized wiring, scene/prefab/asset changes, asmdefs, packages, evidence를 함께 리뷰합니다. | early review 철학을 유지하면서 Unity behavior risk를 review surface에 포함합니다. |
 | `receiving-code-review-unity` | 피드백을 기술적으로 평가한 뒤 compile, console, tests, asset inspection, runtime evidence로 Unity-specific claim을 검증합니다. | review rigor를 유지하고 검증 없는 Unity wiring/architecture 변경을 막습니다. |
-| `verification-before-completion-unity` | active bridge identity, 가능할 때 `Application.dataPath` 또는 equivalent Unity-observed evidence, compile state, console state, EditMode/PlayMode tests, asset inspection, scene/prefab smoke, limitation reporting을 요구합니다. | evidence-before-assertions를 유지하고 file-only check로 runtime claim을 하지 못하게 합니다. |
+| `verification-before-completion-unity` | active bridge identity, `Application.dataPath` 또는 equivalent Unity-observed evidence, compile state, console state, EditMode/PlayMode tests, asset inspection, scene/prefab smoke evidence를 요구합니다. | Unity Editor/runtime claim에 evidence-before-assertions를 적용합니다. |
 | `finishing-a-development-branch-unity` | fresh verification 이후 merge, PR, preserve, discard, cleanup 선택을 안내합니다. | branch completion을 명시적으로 유지하면서 Unity asset과 generated state를 보호합니다. |
 | `compound-unity` | Editor bridge state, scene/prefab serialization, `.meta` GUID, package issue, test timing, architecture decision 같은 Unity blocker와 교훈을 저장합니다. | future agent가 Unity-specific workaround를 다시 발견하지 않도록 reusable lesson을 남깁니다. |
 | `writing-skills-unity` | scene verification, prefab wiring, PlayMode timing, Unity Editor Bridge mode, oversized `MonoBehaviour` 위험을 포함한 pressure scenario로 Unity process skill을 작성/검증합니다. | skill-writing as TDD for process documentation을 유지하되 Unity-specific failure mode를 테스트에 넣습니다. |
@@ -110,7 +110,7 @@ Unity 개발 harness 설정도 처리할 수 있습니다.
 - bridge-specific setup은 아래 분기별 섹션으로 라우팅
 - Unity tool을 신뢰하기 전에 active Unity Editor target 검증
 
-최종 보고에는 project path, Unity version, creation path, template, render pipeline, target platform, manifest changes, Git state, `editor_bridge_mode`, `bridge_state`, `identity_evidence`, compile/console evidence, test readiness, limitations, next recommended skill이 포함되어야 합니다.
+최종 보고에는 project path, Unity version, creation path, template, render pipeline, target platform, manifest changes, Git state, `editor_bridge_mode`, `bridge_state`, `identity_evidence`, compile/console evidence, test readiness, selected bridge evidence gaps, next recommended skill이 포함되어야 합니다.
 
 ## Unity Editor Bridge
 
@@ -118,18 +118,16 @@ Unity Editor integration은 단일 필수 도구가 아니라 `Unity Editor Brid
 
 Bridge modes:
 
-- `unity_ai_assistant`: Unity AI Assistant + Unity Official MCP Server.
+- `unity_ai_assistant`: Unity AI Assistant + Unity MCP Server.
 - `mcpforunity`: external coding agent + MCPForUnity.
-- `file_only`: Editor bridge 없음. file-state evidence만 가능.
 
-- `unity-init`은 Editor integration 설치 또는 설정 전에 bridge mode를 묻습니다.
+- `unity-init`은 Editor integration 설치 또는 설정 전에 사용할 bridge를 묻습니다.
 - Editor 기반 완료 주장은 active Editor bridge evidence 또는 직접 관측한 Unity evidence가 필요합니다.
-- `file_only`는 compile, import, runtime, scene, prefab behavior를 증명할 수 없습니다.
-- 파일 확인만으로 runtime proof를 주장하지 않습니다.
+- Unity Editor 작업은 Unity AI Assistant / Unity MCP 또는 MCPForUnity 중 하나를 사용합니다.
 - Scene, prefab, `.meta`, package, asmdef, ProjectSettings, serialized field 변경은 모두 주요 구현 표면입니다.
 - 여러 Unity Editor가 열려 있으면 active Editor bridge target을 검증하기 전까지 routing risk로 취급합니다.
 
-## Unity AI Assistant / Official MCP 설정
+## Unity AI Assistant / Unity MCP 설정
 
 공식 in-Editor AI workflow를 사용할 때 이 분기를 사용합니다.
 
@@ -146,7 +144,7 @@ Links: [Unity AI open beta guide](https://support.unity.com/hc/en-us/articles/48
 
 ## MCPForUnity 설정
 
-External coding agent와 MCPForUnity를 사용할 때 이 분기를 사용합니다. `unity-init`은 승인 후 Unity 프로젝트에 package를 추가하고, 가능하면 MCPForUnity client configurator를 실행하며, Codex가 Unity MCP tools를 볼 수 있는지 확인합니다.
+External coding agent와 MCPForUnity를 사용할 때 이 분기를 사용합니다. `unity-init`은 승인 후 Unity 프로젝트에 package를 추가하고, 가능하면 MCPForUnity client configurator를 실행하며, Codex가 MCPForUnity tools를 볼 수 있는지 확인합니다.
 
 수동 설정:
 

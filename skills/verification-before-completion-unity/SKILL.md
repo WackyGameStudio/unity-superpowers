@@ -17,8 +17,8 @@ Claiming Unity work is complete without verification is dishonesty, not efficien
 
 Before claiming Unity work is complete, gather fresh evidence:
 
-1. Active bridge mode: `unity_ai_assistant`, `mcpforunity`, `file_only`, or explicit unknown.
-2. Project identity: `Application.dataPath` through the active bridge when available, equivalent Unity-observed evidence, or file-only limitation.
+1. Active bridge mode: `unity_ai_assistant` or `mcpforunity`.
+2. Project identity: `Application.dataPath` through the active bridge or equivalent Unity-observed evidence.
 3. Compile/import/console evidence.
 4. EditMode/PlayMode evidence.
 5. Asset proof for changed scenes, prefabs, `ScriptableObject` assets, packages, asmdefs, and `.meta` files.
@@ -26,7 +26,7 @@ Before claiming Unity work is complete, gather fresh evidence:
 7. Runtime proof for visual, physics-driven, animation-driven, input-driven, or scene-wired behavior.
 8. Limitation report when any required evidence cannot be gathered.
 
-Do not claim Unity Editor or runtime verification if only file-state checks ran.
+Unity Editor and runtime verification must be backed by Unity AI Assistant / Unity MCP or MCPForUnity evidence. Manual observation is supplemental and must reference the selected bridge session.
 
 ## The Iron Law
 

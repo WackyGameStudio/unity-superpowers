@@ -183,7 +183,7 @@ Task 2: Player prefab wiring
 Implementer:
   - Added PlayerInteractor component to Assets/Prefabs/Player.prefab
   - Wired interaction layer mask and InteractionPrompt reference
-  - for `mcpforunity`: `refresh_unity`/`read_console` shows no new relevant errors; otherwise active-bridge compile/console evidence or fallback log
+  - for `mcpforunity`: `refresh_unity`/`read_console` shows no new relevant errors; otherwise Unity AI Assistant / Unity MCP compile/console evidence
   - Prefab smoke: required serialized references present
   - Committed
 

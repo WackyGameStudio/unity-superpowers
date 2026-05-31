@@ -74,6 +74,8 @@ required_fields:
     type: enum
     values:
       - unity_mcp
+      - editor_bridge
+      - bridge_tooling
       - codex_config
       - editor_workflow
       - scene
@@ -124,6 +126,7 @@ track_rules:
         type: enum
         values:
           - active_target_drift
+          - stale_bridge_tools
           - stale_mcp_tools
           - incomplete_editor_setup
           - compile_error
@@ -158,6 +161,7 @@ track_rules:
         type: enum
         values:
           - unity_mcp_retarget
+          - bridge_retarget
           - editor_setup_change
           - code_fix
           - scene_wiring_change
@@ -194,6 +198,7 @@ track_rules:
         type: enum
         values:
           - active_target_drift
+          - stale_bridge_tools
           - stale_mcp_tools
           - incomplete_editor_setup
           - compile_error
@@ -228,6 +233,7 @@ track_rules:
         type: enum
         values:
           - unity_mcp_retarget
+          - bridge_retarget
           - editor_setup_change
           - code_fix
           - scene_wiring_change
@@ -269,13 +275,11 @@ optional_fields:
     values:
       - unity_ai_assistant
       - mcpforunity
-      - file_only
-      - unknown
     description: "Unity Editor bridge mode involved in the issue or verification."
 
   mcp_tool:
     type: string
-    description: "Specific MCPForUnity tool or tool group, or Official MCP tool, when relevant"
+    description: "Specific MCPForUnity tool or tool group, or Unity MCP tool, when relevant"
 
   evidence:
     type: array[string]
@@ -291,6 +295,8 @@ validation_rules:
   - "Array fields must respect min_items and max_items when specified"
   - "date must match YYYY-MM-DD format"
   - "tags should be lowercase and hyphen-separated where possible"
-  - "editor_bridge records bridge mode; mcp_tool records a specific MCPForUnity tool or tool group, or Official MCP tool when relevant"
+  - "editor_bridge records bridge mode; mcp_tool records a specific MCPForUnity tool or tool group, or Unity MCP tool when relevant"
+  - "Prefer bridge-neutral values for new docs: component editor_bridge or bridge_tooling, root_cause stale_bridge_tools, and resolution_type bridge_retarget"
+  - "Legacy MCPForUnity-specific values unity_mcp, stale_mcp_tools, and unity_mcp_retarget are retained only for historical compatibility"
   - "Array-of-strings frontmatter items must be wrapped in double quotes when the value starts with a YAML reserved indicator or contains ': ' or ' #'"
   - "Scalar string frontmatter values must be wrapped in double quotes when the value starts with a YAML reserved indicator or contains ': ' or ' #'"

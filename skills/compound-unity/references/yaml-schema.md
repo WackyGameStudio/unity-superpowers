@@ -28,7 +28,7 @@ Use this file as the quick reference for:
 - `category`: `docs/solutions` subdirectory selected from the category mapping.
 - `module`: Unity project area, package, scene, prefab, subsystem, or workflow affected.
 - `problem_type`: One of the preserved values in the Tracks table above.
-- `component`: One of `unity_mcp`, `codex_config`, `editor_workflow`, `scene`, `prefab`, `script`, `asmdef`, `package`, `project_settings`, `input_system`, `physics`, `animation`, `ui`, `rendering`, `tests_editmode`, `tests_playmode`, `scriptable_object`, `asset_pipeline`, `documentation`, `development_workflow`, `unity_editor`, `navmesh`, `vehicle`, `interaction_system`, `damage_system`, `state_machine`, `verification`, `tooling`.
+- `component`: One of `editor_bridge`, `bridge_tooling`, `unity_mcp` (legacy alias), `codex_config`, `editor_workflow`, `scene`, `prefab`, `script`, `asmdef`, `package`, `project_settings`, `input_system`, `physics`, `animation`, `ui`, `rendering`, `tests_editmode`, `tests_playmode`, `scriptable_object`, `asset_pipeline`, `documentation`, `development_workflow`, `unity_editor`, `navmesh`, `vehicle`, `interaction_system`, `damage_system`, `state_machine`, `verification`, `tooling`.
 - `severity`: One of `critical`, `high`, `medium`, `low`.
 
 ## Bug Track Fields
@@ -36,8 +36,8 @@ Use this file as the quick reference for:
 Required:
 
 - `symptoms`: YAML array with 1-6 observable symptoms such as console errors, failed tests, broken scene/prefab behavior, or runtime issues.
-- `root_cause`: Use the narrowest value from `schema.yaml`. Values may be Unity-specific, for example `active_target_drift`, `stale_mcp_tools`, `missing_serialized_reference`, `prefab_override_conflict`, `guid_mismatch`, `asmdef_reference_missing`, `package_dependency_missing`, `fixed_update_timing`, `animation_event_mismatch`, `input_action_miswired`, `scriptable_object_reference_missing`, `missing_scene_wiring`, or `insufficient_verification`.
-- `resolution_type`: Use the narrowest value from `schema.yaml`. Values may be Unity-specific, for example `unity_mcp_retarget`, `scene_wiring_change`, `prefab_wiring_change`, `serialization_fix`, `meta_guid_restore`, `asmdef_reference_change`, `package_manifest_change`, `playmode_fix`, `editmode_fix`, `architecture_refactor`, `verification_update`, or `workaround`.
+- `root_cause`: Use the narrowest value from `schema.yaml`. Values may be Unity-specific, for example `active_target_drift`, `stale_bridge_tools`, `missing_serialized_reference`, `prefab_override_conflict`, `guid_mismatch`, `asmdef_reference_missing`, `package_dependency_missing`, `fixed_update_timing`, `animation_event_mismatch`, `input_action_miswired`, `scriptable_object_reference_missing`, `missing_scene_wiring`, or `insufficient_verification`.
+- `resolution_type`: Use the narrowest value from `schema.yaml`. Values may be Unity-specific, for example `bridge_retarget`, `scene_wiring_change`, `prefab_wiring_change`, `serialization_fix`, `meta_guid_restore`, `asmdef_reference_change`, `package_manifest_change`, `playmode_fix`, `editmode_fix`, `architecture_refactor`, `verification_update`, or `workaround`.
 
 ## Knowledge Track Fields
 
@@ -55,8 +55,8 @@ Optional:
 - `related_components`: Other Unity components, scenes, prefabs, assets, packages, or workflows involved.
 - `tags`: Search keywords, lowercase and hyphen-separated where possible.
 - `unity_version`: Unity Editor version when relevant.
-- `editor_bridge`: Unity Editor bridge mode involved in the issue or verification. Use one of `unity_ai_assistant`, `mcpforunity`, `file_only`, or `unknown`.
-- `mcp_tool`: Specific MCPForUnity tool or tool group, or Official MCP tool, when relevant. `editor_bridge` records the mode; `mcp_tool` records the specific tool when relevant.
+- `editor_bridge`: Unity Editor bridge mode involved in the issue or verification. Use `unity_ai_assistant` or `mcpforunity`.
+- `mcp_tool`: Specific MCPForUnity tool or tool group, or Unity MCP tool, when relevant. `editor_bridge` records the mode; `mcp_tool` records the specific tool when relevant.
 - `evidence`: Short list of verification evidence commands, tests, console checks, or smoke checks.
 
 Example bridge metadata:
@@ -96,6 +96,7 @@ mcp_tool: read_console
 6. Array fields must respect min/max item counts.
 7. `date` must match `YYYY-MM-DD`.
 8. `tags` should be lowercase and hyphen-separated where possible.
+9. Prefer bridge-neutral values for new docs: `component: editor_bridge` or `bridge_tooling`, `root_cause: stale_bridge_tools`, and `resolution_type: bridge_retarget`. `unity_mcp`, `stale_mcp_tools`, and `unity_mcp_retarget` are legacy aliases for old MCPForUnity-only records.
 
 ## YAML Safety Rules
 

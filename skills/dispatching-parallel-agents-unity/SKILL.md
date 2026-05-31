@@ -70,7 +70,7 @@ Each agent gets:
 - **Specific scope:** exact files, folders, tests, scenes, prefabs, or assets.
 - **Clear goal:** the behavior or failure to resolve.
 - **Constraints:** files and Unity surfaces it must not touch.
-- **Evidence:** exact EditMode, PlayMode, console, scene smoke, prefab smoke, or file-only limitation.
+- **Evidence:** exact EditMode, PlayMode, console, scene smoke, prefab smoke, or bridge-specific evidence.
 - **Expected output:** root cause, changes, evidence, files touched, concerns.
 
 ### 3. Dispatch in Parallel
@@ -118,7 +118,7 @@ Return:
 - Root cause
 - Files changed
 - Test command and result
-- Any limitations
+- Any task constraints or selected bridge evidence gaps
 ```
 
 ## Common Mistakes

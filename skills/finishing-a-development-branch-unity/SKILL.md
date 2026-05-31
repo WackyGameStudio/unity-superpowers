@@ -17,7 +17,7 @@ Guide completion of Unity development work by verifying evidence, presenting cle
 
 Before presenting finish options, check:
 
-- active Editor bridge target identity, plus `Application.dataPath` through the active bridge when available, when Editor work was involved
+- active Editor bridge target identity, plus `Application.dataPath` through the selected active bridge, when Editor work was involved
 - compile/domain reload state
 - Unity console errors and warnings after the final refresh
 - relevant EditMode tests
@@ -29,7 +29,7 @@ Before presenting finish options, check:
 - large binary assets are expected and Git LFS guidance is noted when applicable
 - `docs/solutions/` capture was considered for non-trivial Unity lessons
 
-Do not claim Unity Editor or runtime verification from file-state checks alone.
+Unity Editor and runtime verification must be backed by Unity AI Assistant / Unity MCP or MCPForUnity evidence. Manual observation is supplemental and must reference the selected bridge session.
 
 ## The Process
 
@@ -40,10 +40,10 @@ Before presenting options, verify the strongest relevant Unity evidence availabl
 Use the project's actual commands or active bridge tools or evidence. Typical evidence chain:
 
 ```text
-Editor bridge mode -> active Editor bridge target identity -> Application.dataPath through the active bridge when available -> refresh/import evidence -> console evidence -> EditMode tests -> PlayMode tests -> scene/prefab smoke
+Editor bridge mode -> active Editor bridge target identity -> Application.dataPath through the selected active bridge -> refresh/import evidence -> console evidence -> EditMode tests -> PlayMode tests -> scene/prefab smoke
 ```
 
-If no Editor bridge is available, report the limitation and use only valid fallback evidence. Do not claim Editor/runtime proof.
+Unity Editor work uses either Unity AI Assistant / Unity MCP or MCPForUnity for final Editor/runtime evidence.
 
 **If verification fails:**
 
@@ -57,7 +57,7 @@ Cannot proceed with merge/PR until verification passes.
 
 Stop. Do not proceed to Step 2.
 
-**If verification passes or limitations are explicit and accepted:** Continue to Step 2.
+**If verification passes:** Continue to Step 2.
 
 ### Step 2: Detect Environment
 

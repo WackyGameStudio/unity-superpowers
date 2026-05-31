@@ -21,7 +21,7 @@ Review code and Unity artifacts together:
 - Editor/runtime assembly separation
 - Editor bridge mode and target assumptions
 - EditMode, PlayMode, console, scene smoke, and prefab smoke evidence
-- bridge mode, identity evidence, Unity evidence gathered, and limitations
+- bridge mode, identity evidence, Unity evidence gathered, and selected bridge evidence gaps
 
 Findings must cite exact files and explain the Unity behavior risk.
 

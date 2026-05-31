@@ -27,13 +27,12 @@ Install the skill pack first. `unity-init` asks for bridge mode before installin
 
 Bridge modes:
 
-- `unity_ai_assistant`: Unity AI Assistant + Unity Official MCP Server.
+- `unity_ai_assistant`: Unity AI Assistant + Unity MCP Server.
 - `mcpforunity`: external coding agent + MCPForUnity.
-- `file_only`: no Editor bridge; file-state evidence only.
 
-Editor-backed claims require active Editor bridge evidence or directly observed Unity evidence. `file_only` cannot prove compile, import, runtime, scene, or prefab behavior.
+Editor-backed claims require Unity AI Assistant / Unity MCP or MCPForUnity evidence.
 
-### Unity AI Assistant / Official MCP Setup
+### Unity AI Assistant / Unity MCP Setup
 
 Use this branch for the official in-Editor AI workflow.
 
@@ -143,9 +142,9 @@ After installation, verify:
 
 - all 16 skill folders are present
 - every skill folder contains `SKILL.md`
-- installed guidance defines Unity Editor Bridge modes: `unity_ai_assistant`, `mcpforunity`, and `file_only`
+- installed guidance defines Unity Editor Bridge modes: `unity_ai_assistant` and `mcpforunity`
 - installed guidance keeps MCPForUnity setup only under the MCPForUnity Setup branch
-- installed guidance tells the agent not to claim Unity Editor or runtime verification from file-state checks alone
+- installed guidance tells the agent to verify Unity Editor/runtime claims through Unity AI Assistant / Unity MCP or MCPForUnity evidence
 - existing project-specific guidance was preserved
 
 If the target project already has Unity-specific skills, report conflicts before replacing them.

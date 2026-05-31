@@ -28,22 +28,21 @@ Unity Editor integration is modeled as `Unity Editor Bridge`.
 
 Bridge modes:
 
-- `unity_ai_assistant`: Unity AI Assistant + Unity Official MCP Server.
+- `unity_ai_assistant`: Unity AI Assistant + Unity MCP Server.
 - `mcpforunity`: external coding agent + MCPForUnity.
-- `file_only`: no Editor bridge; file-state evidence only.
 
-`unity-init` asks for bridge mode before installing or configuring Editor integration.
+`unity-init` asks which Editor bridge to use before installing or configuring Editor integration.
 
 Before changing scenes, prefabs, assets, packages, ProjectSettings, tests, or runtime behavior:
 
 - confirm the active Editor bridge target is the intended Unity project
-- confirm project identity with `Application.dataPath` through the active bridge when available, or equivalent directly observed Unity evidence
+- confirm project identity with `Application.dataPath` through the selected active bridge
 - if multiple Unity Editors are open, select or confirm the correct active instance first
-- if no active Editor bridge exists, or it is pointed at another project, report that Editor-backed control and runtime verification are unavailable
+- use either Unity AI Assistant / Unity MCP or MCPForUnity as the active Editor bridge
 
-Editor-backed claims require active Editor bridge evidence or directly observed Unity evidence. Do not claim Unity Editor or runtime verification from file-state checks alone. `file_only` cannot prove compile, import, runtime, scene, or prefab behavior.
+Editor-backed claims require Unity AI Assistant / Unity MCP or MCPForUnity evidence.
 
-### Unity AI Assistant / Official MCP Setup
+### Unity AI Assistant / Unity MCP Setup
 
 Use this branch for the official in-Editor AI workflow.
 

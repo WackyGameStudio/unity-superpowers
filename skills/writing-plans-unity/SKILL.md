@@ -52,7 +52,7 @@ Before defining tasks, map every relevant Unity implementation surface. Plans MU
 - EditMode test files
 - PlayMode test files and PlayMode test scenes
 - active bridge tools or evidence to use, including active Editor bridge target identity checks when Editor work is involved
-- file-state limitations to report when no Editor bridge is available, or when the active bridge is stale or aimed at the wrong project
+- active Editor bridge mode, target identity, and tool/evidence path when Editor work is involved
 - console, compile, and domain reload checks
 - manual verification with a reason only when automation is infeasible
 
@@ -145,10 +145,10 @@ Each Unity task MUST include these fields. Use `None` only after checking the su
 - TDD: [red/green/refactor steps when automated tests are feasible; otherwise manual-only reason]
 
 **Editor Bridge:**
-- Mode: [`unity_ai_assistant` | `mcpforunity` | `file_only` | unknown with reason]
+- Mode: [`unity_ai_assistant` | `mcpforunity`]
 - Target identity: [active bridge/project check plus `Application.dataPath` or equivalent evidence where Editor work is involved]
-- Tool/evidence path: [Unity AI Assistant/Official MCP, direct Unity observation, file-only limitation, or for `mcpforunity`: `validate_script`, `refresh_unity`, `read_console`, `run_tests`, `manage_scene`, `manage_prefabs`, `manage_asset` as applicable]
-- Limitation: [state explicitly when no Editor bridge is available and Editor/runtime proof cannot be claimed]
+- Tool/evidence path: [Unity AI Assistant / Unity MCP capabilities, or for `mcpforunity`: `validate_script`, `refresh_unity`, `read_console`, `run_tests`, `manage_scene`, `manage_prefabs`, `manage_asset` as applicable]
+- Selected bridge evidence gaps: [state explicitly when the selected bridge cannot provide a required evidence surface]
 
 **Verification:**
 - Expected evidence: [compile/domain reload result, console result, EditMode/PlayMode output, scene smoke, prefab smoke, runtime/manual observation with reason]
@@ -214,7 +214,7 @@ Reject and rewrite the plan if any of these are true:
 
 - It only says "edit scripts and run tests" while scene, prefab, asset, package, ProjectSettings, Animator, physics, or Unity Editor wiring is involved.
 - It names code files but does not name the affected scene path, prefab path, asset path, serialized field wiring, package/settings file, or `.meta` risk when those surfaces matter.
-- It claims Unity runtime or Editor verification from file-only checks.
+- It claims Unity runtime or Editor verification without Unity AI Assistant / Unity MCP or MCPForUnity evidence.
 - It adds a `MonoBehaviour` without explaining where it is attached and how required serialized fields are assigned.
 - It adds an interface, `State`, `Strategy`, event, factory, or `ScriptableObject` without showing the scene/prefab/code wiring that makes it active.
 - It uses any Editor bridge without checking the active target.

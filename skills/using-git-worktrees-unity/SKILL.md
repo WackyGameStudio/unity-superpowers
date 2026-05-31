@@ -141,20 +141,20 @@ if [ -f go.mod ]; then go mod download; fi
 Run the strongest available baseline evidence before implementation:
 
 ```text
-Editor bridge mode -> active Editor bridge target identity -> Application.dataPath through the active bridge when available -> refresh/import evidence -> console evidence -> EditMode tests -> PlayMode tests where relevant
+Editor bridge mode -> active Editor bridge target identity -> Application.dataPath through the selected active bridge -> refresh/import evidence -> console evidence -> EditMode tests -> PlayMode tests where relevant
 ```
 
-If no Editor bridge is available, run valid project fallback checks and report that Editor/runtime proof is unavailable. Do not claim Unity runtime or Editor verification from file-state checks alone.
+Unity Editor work uses either Unity AI Assistant / Unity MCP or MCPForUnity. Non-Unity file or documentation checks can proceed outside the Unity workflow.
 
 **If baseline verification fails:** Report failures, ask whether to proceed, investigate, or fix setup first.
 
-**If baseline verification passes or limitations are explicit:** Report ready.
+**If baseline verification passes:** Report ready.
 
 ### Report
 
 ```
 Worktree ready at <full-path>
-Baseline evidence: <bridge mode | active Editor bridge target identity | console | tests | limitations>
+Baseline evidence: <bridge mode | active Editor bridge target identity | console | tests | selected bridge evidence gaps>
 Ready to implement <feature-name>
 ```
 
