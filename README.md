@@ -1,8 +1,10 @@
-# Unity Superpowers 0.0.1
+# Unity Superpowers
 
 English | [한국어](README_kr.md)
 
 Unity Superpowers is a lightweight project-local skill pack for AI-assisted Unity game development.
+
+Current version: `0.1.0`.
 
 It keeps the Superpowers workflow discipline while focusing on Unity-specific work: project setup, Unity Editor Bridge modes, scenes, prefabs, serialized data, packages, tests, debugging, review, and verification.
 
@@ -11,11 +13,13 @@ The intended first step is `unity-init`. It audits or prepares the Unity project
 ## Contents
 
 ```text
-unity-superpowers-0.0.1/
+unity-superpowers/
   AGENTS.md
+  CHANGELOG.md
   HowToInstall_AI.md
   README.md
   README_kr.md
+  VERSION
   skills/
     brainstorming-unity/
     compound-unity/

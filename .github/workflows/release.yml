@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publish GitHub release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build release archive
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $name = "unity-superpowers-$tag"
+          $stage = Join-Path "dist" $name
+
+          New-Item -ItemType Directory -Force -Path $stage | Out-Null
+          Copy-Item AGENTS.md,HowToInstall_AI.md,README.md,README_kr.md,CHANGELOG.md,VERSION -Destination $stage
+          Copy-Item skills -Destination $stage -Recurse
+
+          Compress-Archive -Path $stage -DestinationPath "dist/$name.zip" -Force
+
+      - name: Extract release notes
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          $lines = Get-Content CHANGELOG.md
+          $start = ($lines | Select-String -Pattern "^## \[$version\]" | Select-Object -First 1).LineNumber
+
+          if (-not $start) {
+            "# ${{ github.ref_name }}" | Set-Content release-notes.md
+            exit 0
+          }
+
+          $next = ($lines | Select-String -Pattern "^## \[" | Where-Object { $_.LineNumber -gt $start } | Select-Object -First 1).LineNumber
+
+          if ($next) {
+            $section = $lines[($start - 1)..($next - 2)]
+          } else {
+            $section = $lines[($start - 1)..($lines.Count - 1)]
+          }
+
+          $section | Set-Content release-notes.md
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: release-notes.md
+          files: dist/unity-superpowers-${{ github.ref_name }}.zip
+          fail_on_unmatched_files: true

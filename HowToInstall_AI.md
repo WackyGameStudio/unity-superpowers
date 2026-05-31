@@ -5,10 +5,12 @@ You are installing this Unity Superpowers package into a Unity project for a cod
 Source package:
 
 ```text
-unity-superpowers-0.0.1/
+unity-superpowers/
   AGENTS.md
+  CHANGELOG.md
   README.md
   HowToInstall_AI.md
+  VERSION
   skills/
 ```
 
